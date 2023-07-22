@@ -1,0 +1,52 @@
+@import './reset.scss';
+
+body {
+  background-color: #1a1a1a;
+  color: #dfe5ff;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+#app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+h1 {
+  text-align: center;
+  margin: 1rem 0;
+  font-size: 2.5rem;
+}
+
+.teaser {
+  font-size: 18px;
+  color: gray;
+  text-align: center;
+
+  &.light {
+    margin-top: 5px;
+  }
+
+  span {
+    background: rgb(48, 48, 48);
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: #a2a2aa;
+    font-size: 17px;
+  }
+}
+
+button {
+  padding: 0.5em 1em;
+  cursor: pointer;
+}
+
+.repo-list {
+  display: flex;
+  justify-content: space-between;
+}
