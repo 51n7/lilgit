@@ -1,15 +1,23 @@
 import { useEffect, useState } from 'react';
 import { Repo } from 'src/types';
 import { BranchSummary } from 'simple-git';
+import Status from './Status';
+import Branches from './Branches';
+import Graph from './Graph';
 
 const App = () => {
-  console.log('App');
   const [repoList, setRepoList] = useState<Repo[]>([]);
   const [branchList, setBranchList] = useState<BranchSummary>();
   const [currentRepo, setCurrentRepo] = useState<string | undefined>();
+  const [viewState, setViewState] = useState<number>(0);
+  const views = [
+    <Status currentRepo={currentRepo} />,
+    <Branches branches={branchList} />,
+    <Graph />,
+  ];
 
-  window.api.handleEventFromMain('key-press', (data) => {
-    console.log('renderer:', data);
+  window.api.handleEventFromMain('key-press', () => {
+    setViewState(viewState === views.length - 1 ? 0 : viewState + 1);
   });
 
   async function deleteRepo(index: number) {
@@ -73,27 +81,12 @@ const App = () => {
     <div>
       {currentRepo && (
         <div>
-          <h1>Branches</h1>
-          <p>{currentRepo}</p>
-          <br />
-          <hr />
-          <br />
-          {branchList &&
-            Object.entries(branchList.branches).map(
-              ([branchName, branchInfo]) => (
-                <li key={branchName}>
-                  {branchInfo.commit} - {branchName}
-                  {/* <br />
-                  <strong>Commit:</strong> {branchInfo.commit}
-                  <br />
-                  <strong>Label:</strong> {branchInfo.label} */}
-                </li>
-              ),
-            )}
-          <br />
-          <hr />
-          <br />
-          <button type='button' onClick={() => removeCurrentRepo()}>
+          {views[viewState]}
+          <button
+            type='button'
+            className='closeRepo'
+            onClick={() => removeCurrentRepo()}
+          >
             close
           </button>
         </div>

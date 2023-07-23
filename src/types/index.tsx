@@ -1,6 +1,13 @@
+import { BranchSummary } from 'simple-git';
+
 export type Repo = {
   label: string;
   value: string;
+};
+
+export type RepoProps = {
+  currentRepo?: string;
+  branches?: BranchSummary;
 };
 
 // export type BranchInfo = {
