@@ -7,6 +7,10 @@ const App = () => {
   const [branchList, setBranchList] = useState<BranchSummary>();
   const [currentRepo, setCurrentRepo] = useState<string | undefined>();
 
+  window.api.keyPress((key) => {
+    console.log(key);
+  });
+
   async function deleteRepo(index: number) {
     const tmpArray = [...repoList];
     tmpArray.splice(index, 1);

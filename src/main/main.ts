@@ -77,6 +77,14 @@ function createMainWindow() {
     },
   });
 
+  mainWindow.loadFile('index.html');
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.key === 'Tab') {
+      mainWindow?.webContents.send('key-press', input.key);
+      event.preventDefault();
+    }
+  });
+
   // Load the index.html of the app window.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);

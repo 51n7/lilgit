@@ -19,15 +19,21 @@ export type ContextBridgeApi = {
   savePath: (path: string) => Promise<string>;
   getPath: () => Promise<string>;
   getBranches: (path: string | undefined) => Promise<BranchSummary>;
+  keyPress(cb: (key: string) => void): void;
 };
 
 const exposedApi: ContextBridgeApi = {
+  keyPress: (cb: (key: string) => void) => {
+    ipcRenderer.removeAllListeners('key-press'); // debouncing hack to avoid event accumulation
+    ipcRenderer.once('key-press', (_event, key) => cb(key));
+  },
+
   getRepos: () => {
-    // Send IPC event to main process to read the file.
+    // Send IPC event to main process
     ipcRenderer.send('get-repos');
 
     // Wrap a promise around the `.once` listener that will be sent back from
-    // the main process, once the file has been read.
+    // the main process
     return new Promise((resolve) => {
       ipcRenderer.once('get-repos-success', (_event, data: Repo[]) =>
         resolve(data),
@@ -98,6 +104,16 @@ const exposedApi: ContextBridgeApi = {
       );
     });
   },
+
+  // keyPress: () => {
+  //   // ipcRenderer.send('get-key');
+
+  //   return new Promise((resolve) => {
+  //     ipcRenderer.once('get-key-success', (_event, data: string) =>
+  //       resolve(data),
+  //     );
+  //   });
+  // },
 };
 
 // Expose our functions in the `api` namespace of the renderer `Window`.
