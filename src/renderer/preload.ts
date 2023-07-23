@@ -19,13 +19,16 @@ export type ContextBridgeApi = {
   savePath: (path: string) => Promise<string>;
   getPath: () => Promise<string>;
   getBranches: (path: string | undefined) => Promise<BranchSummary>;
-  keyPress(cb: (key: string) => void): void;
+  handleEventFromMain: (
+    eventName: string,
+    callback: (eventData: string) => void,
+  ) => void;
 };
 
 const exposedApi: ContextBridgeApi = {
-  keyPress: (cb: (key: string) => void) => {
-    ipcRenderer.removeAllListeners('key-press'); // debouncing hack to avoid event accumulation
-    ipcRenderer.once('key-press', (_event, key) => cb(key));
+  handleEventFromMain: (eventName, callback) => {
+    ipcRenderer.removeAllListeners(eventName); // debouncing hack to avoid event accumulation
+    ipcRenderer.on(eventName, (_, eventData) => callback(eventData));
   },
 
   getRepos: () => {
@@ -104,16 +107,6 @@ const exposedApi: ContextBridgeApi = {
       );
     });
   },
-
-  // keyPress: () => {
-  //   // ipcRenderer.send('get-key');
-
-  //   return new Promise((resolve) => {
-  //     ipcRenderer.once('get-key-success', (_event, data: string) =>
-  //       resolve(data),
-  //     );
-  //   });
-  // },
 };
 
 // Expose our functions in the `api` namespace of the renderer `Window`.

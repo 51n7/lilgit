@@ -3,12 +3,13 @@ import { Repo } from 'src/types';
 import { BranchSummary } from 'simple-git';
 
 const App = () => {
+  console.log('App');
   const [repoList, setRepoList] = useState<Repo[]>([]);
   const [branchList, setBranchList] = useState<BranchSummary>();
   const [currentRepo, setCurrentRepo] = useState<string | undefined>();
 
-  window.api.keyPress((key) => {
-    console.log(key);
+  window.api.handleEventFromMain('key-press', (data) => {
+    console.log('renderer:', data);
   });
 
   async function deleteRepo(index: number) {
@@ -66,7 +67,7 @@ const App = () => {
       setBranchList(await window.api.getBranches(currentRepo));
     };
     fetchData().catch(console.error);
-  }, [currentRepo, branchList]);
+  }, [currentRepo]);
 
   return (
     <div>
