@@ -16,8 +16,13 @@ const App = () => {
     <Graph />,
   ];
 
-  window.api.handleEventFromMain('key-press', () => {
-    setViewState(viewState === views.length - 1 ? 0 : viewState + 1);
+  window.api.handleEventFromMain('key-press', (direction) => {
+    if (direction === 'forward') {
+      setViewState(viewState === views.length - 1 ? 0 : viewState + 1);
+    }
+    if (direction === 'backward') {
+      setViewState(viewState === 0 ? views.length - 1 : viewState - 1);
+    }
   });
 
   async function deleteRepo(index: number) {

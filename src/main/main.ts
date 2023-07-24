@@ -79,10 +79,13 @@ function createMainWindow() {
 
   mainWindow.loadFile('index.html');
   mainWindow.webContents.on('before-input-event', (event, input) => {
-    if (input.key === 'Tab') {
-      mainWindow?.webContents.send('key-press', input.key);
-      event.preventDefault();
+    if (!input.shift && input.key === 'Tab') {
+      mainWindow?.webContents.send('key-press', 'forward');
     }
+    if (input.shift && input.key === 'Tab') {
+      mainWindow?.webContents.send('key-press', 'backward');
+    }
+    event.preventDefault();
   });
 
   // Load the index.html of the app window.
