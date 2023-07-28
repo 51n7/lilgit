@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Repo } from 'src/types';
+import { RepoPathProp } from 'src/types';
 import { BranchSummary } from 'simple-git';
 import Status from './Status';
 import Branches from './Branches';
 import Graph from './Graph';
 
 const App = () => {
-  const [repoList, setRepoList] = useState<Repo[]>([]);
+  const [repoList, setRepoList] = useState<RepoPathProp[]>([]);
   const [branchList, setBranchList] = useState<BranchSummary>();
   const [currentRepo, setCurrentRepo] = useState<string | undefined>();
   const [viewState, setViewState] = useState<number>(0);
@@ -44,18 +44,11 @@ const App = () => {
   }
 
   async function folderSelect() {
-    const newPath = await window.api.getPath();
+    const newRepo = await window.api.getPath();
 
-    if (newPath) {
-      setRepoList((prevValue) => [
-        ...prevValue,
-        {
-          label: newPath,
-          value: newPath,
-        },
-      ]);
-
-      await window.api.savePath(newPath);
+    if (newRepo) {
+      setRepoList((prevValue) => [...prevValue, newRepo]);
+      await window.api.savePath(newRepo);
     }
   }
 
@@ -101,12 +94,12 @@ const App = () => {
           {repoList &&
             repoList.map((type, index) => {
               return (
-                <div key={type.label} className='repo-list'>
+                <div key={type.short} className='repo-list'>
                   <button
                     type='button'
-                    onClick={() => saveCurrentRepo(type.value)}
+                    onClick={() => saveCurrentRepo(type.absolute)}
                   >
-                    {type.label}
+                    {type.short}
                   </button>
                   <button type='button' onClick={() => deleteRepo(index)}>
                     x

@@ -1,8 +1,8 @@
 import { BranchSummary } from 'simple-git';
 
-export type Repo = {
-  label: string;
-  value: string;
+export type RepoPathProp = {
+  absolute: string;
+  short: string;
 };
 
 export type RepoProps = {

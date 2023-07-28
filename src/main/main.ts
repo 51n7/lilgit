@@ -1,9 +1,9 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'path';
-// import fs from 'fs';
+import os from 'os';
 import { simpleGit } from 'simple-git';
 import Store from 'electron-store'; // https://github.com/sindresorhus/electron-store
-import { Repo } from 'src/types';
+import { RepoPathProp } from 'src/types';
 
 /** Handle creating/removing shortcuts on Windows when installing/uninstalling. */
 if (require('electron-squirrel-startup')) {
@@ -58,7 +58,7 @@ app.on('window-all-closed', () => {
  * @returns {BrowserWindow} Main window instance
  */
 
-function createMainWindow() {
+function createMainWindow(): BrowserWindow {
   mainWindow = new BrowserWindow({
     width: 860,
     height: 600,
@@ -116,6 +116,17 @@ function createMainWindow() {
  * You can also put them in separate files and import them here.
  */
 
+function convertToTildePath(inputPath: string) {
+  const homeDirectory = os.homedir();
+  const normalizedPath = path.normalize(inputPath);
+
+  if (normalizedPath.startsWith(homeDirectory)) {
+    return `~${normalizedPath.slice(homeDirectory.length)}`;
+  }
+
+  return inputPath;
+}
+
 async function getBranches(path: string) {
   if (path) {
     const options = {
@@ -129,13 +140,21 @@ async function getBranches(path: string) {
   }
 }
 
-async function selectFolder(defaultPath?: string): Promise<string | null> {
+async function selectFolder(
+  defaultPath?: string,
+): Promise<RepoPathProp | null> {
   if (mainWindow) {
     const result = await dialog.showOpenDialog(mainWindow, {
       defaultPath,
       properties: ['openDirectory'],
     });
-    return result.canceled ? null : result.filePaths[0];
+
+    return result.canceled
+      ? null
+      : {
+          absolute: result.filePaths[0],
+          short: convertToTildePath(result.filePaths[0]),
+        };
   }
   return null;
 }
@@ -148,7 +167,7 @@ app.whenReady().then(() => {
     store.set('repos', []);
   }
 
-  const pathsArray: Repo[] = store.get('repos') as [];
+  const pathsArray: RepoPathProp[] = store.get('repos') as [];
 
   ipcMain.on('get-current', (event) => {
     event.sender.send('get-current-success', store.get('current-repo'));
@@ -172,10 +191,7 @@ app.whenReady().then(() => {
   });
 
   ipcMain.on('save-path', (_event, path) => {
-    pathsArray.push({
-      label: path,
-      value: path,
-    });
+    pathsArray.push(path);
     store.set('repos', pathsArray);
   });
 

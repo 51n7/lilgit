@@ -5,19 +5,19 @@
 // We use it in the preload instead of renderer in order to expose only
 // whitelisted wrappers to increase the security of our aplication.
 import { contextBridge, ipcRenderer } from 'electron';
-import { Repo } from 'src/types';
+import { RepoPathProp } from 'src/types';
 import { BranchSummary } from 'simple-git';
 
 // Create a type that should contain all the data we need to expose in the
 // renderer process using `contextBridge`.
 export type ContextBridgeApi = {
-  getRepos: () => Promise<Repo[]>;
+  getRepos: () => Promise<RepoPathProp[]>;
   getCurrent: () => Promise<string>;
   saveCurrent: (path: string) => Promise<string>;
   removeCurrent: () => void;
   deleteRepo: (index: number) => Promise<number>;
-  savePath: (path: string) => Promise<string>;
-  getPath: () => Promise<string>;
+  savePath: (path: RepoPathProp) => Promise<RepoPathProp>;
+  getPath: () => Promise<RepoPathProp>;
   getBranches: (path: string | undefined) => Promise<BranchSummary>;
   handleEventFromMain: (
     eventName: string,
@@ -38,7 +38,7 @@ const exposedApi: ContextBridgeApi = {
     // Wrap a promise around the `.once` listener that will be sent back from
     // the main process
     return new Promise((resolve) => {
-      ipcRenderer.once('get-repos-success', (_event, data: Repo[]) =>
+      ipcRenderer.once('get-repos-success', (_event, data: RepoPathProp[]) =>
         resolve(data),
       );
     });
@@ -82,7 +82,7 @@ const exposedApi: ContextBridgeApi = {
     ipcRenderer.send('save-path', path);
 
     return new Promise((resolve) => {
-      ipcRenderer.once('save-path-success', (_event, data: string) =>
+      ipcRenderer.once('save-path-success', (_event, data: RepoPathProp) =>
         resolve(data),
       );
     });
@@ -92,7 +92,7 @@ const exposedApi: ContextBridgeApi = {
     ipcRenderer.send('get-path');
 
     return new Promise((resolve) => {
-      ipcRenderer.once('get-path-success', (_event, data: string) =>
+      ipcRenderer.once('get-path-success', (_event, data: RepoPathProp) =>
         resolve(data),
       );
     });
