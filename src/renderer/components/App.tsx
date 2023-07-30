@@ -47,7 +47,6 @@ const App = () => {
     const fetchRepos = async () => {
       try {
         const current = await window.api.getCurrent();
-        console.log(current);
         setCurrentRepo(current);
         setRepoList(await window.api.getRepos());
         setBranchList(await window.api.getBranches(current));
@@ -93,7 +92,7 @@ const App = () => {
             className='closeRepo'
             onClick={() => removeCurrentRepo()}
           >
-            close
+            back
           </button>
         </div>
       )}
