@@ -16,15 +16,6 @@ const App = () => {
     <Graph />,
   ];
 
-  window.api.handleEventFromMain('key-press', (direction) => {
-    if (direction === 'forward') {
-      setViewState(viewState === views.length - 1 ? 0 : viewState + 1);
-    }
-    if (direction === 'backward') {
-      setViewState(viewState === 0 ? views.length - 1 : viewState - 1);
-    }
-  });
-
   async function deleteRepo(index: number) {
     const tmpArray = [...repoList];
     tmpArray.splice(index, 1);
@@ -67,6 +58,23 @@ const App = () => {
 
     fetchRepos();
   }, []);
+
+  useEffect(() => {
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (!e.shiftKey && e.code == 'Tab') {
+        setViewState(viewState === views.length - 1 ? 0 : viewState + 1);
+      }
+      if (e.shiftKey && e.code == 'Tab') {
+        setViewState(viewState === 0 ? views.length - 1 : viewState - 1);
+      }
+    };
+    window.addEventListener('keyup', handleKeyUp);
+
+    // clean up the event listener on unmount
+    return () => {
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [viewState, views.length]);
 
   useEffect(() => {
     const fetchData = async () => {

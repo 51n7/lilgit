@@ -19,18 +19,9 @@ export type ContextBridgeApi = {
   savePath: (path: RepoPathProp) => Promise<RepoPathProp>;
   getPath: () => Promise<RepoPathProp>;
   getBranches: (path: string | undefined) => Promise<BranchSummary>;
-  handleEventFromMain: (
-    eventName: string,
-    callback: (eventData: string) => void,
-  ) => void;
 };
 
 const exposedApi: ContextBridgeApi = {
-  handleEventFromMain: (eventName, callback) => {
-    ipcRenderer.removeAllListeners(eventName); // debouncing hack to avoid event accumulation
-    ipcRenderer.on(eventName, (_, eventData) => callback(eventData));
-  },
-
   getRepos: () => {
     // Send IPC event to main process
     ipcRenderer.send('get-repos');
