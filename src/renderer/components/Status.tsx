@@ -7,13 +7,13 @@ function Status({ currentRepo }: RepoProps) {
       {
         key: 's',
         function: () => {
-          console.log('s key was hit');
+          console.log('s key was hit in status');
         },
       },
       {
         key: 'a',
         function: () => {
-          console.log('a key was hit');
+          console.log('a key was hit in status');
         },
       },
     ],

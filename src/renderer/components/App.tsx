@@ -12,7 +12,7 @@ const App = () => {
   const [viewState, setViewState] = useState<number>(0);
   const views = [
     <Status currentRepo={currentRepo} />,
-    <Branches branches={branchList} />,
+    <Branches currentRepo={currentRepo} branches={branchList} />,
     <Graph />,
   ];
 

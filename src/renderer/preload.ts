@@ -19,6 +19,7 @@ export type ContextBridgeApi = {
   savePath: (path: RepoPathProp) => Promise<RepoPathProp>;
   getPath: () => Promise<RepoPathProp>;
   getBranches: (path: string | undefined) => Promise<BranchSummary>;
+  checkoutBranch: (path: string | undefined, branch: string) => Promise<string>;
 };
 
 const exposedApi: ContextBridgeApi = {
@@ -94,6 +95,16 @@ const exposedApi: ContextBridgeApi = {
 
     return new Promise((resolve) => {
       ipcRenderer.once('get-branches-success', (_event, data: BranchSummary) =>
+        resolve(data),
+      );
+    });
+  },
+
+  checkoutBranch: (path, branch) => {
+    ipcRenderer.send('checkout-branch', path, branch);
+
+    return new Promise((resolve) => {
+      ipcRenderer.once('checkout-branch-success', (_event, data: string) =>
         resolve(data),
       );
     });

@@ -127,7 +127,22 @@ async function getBranches(path: string) {
       trimmed: false,
     };
     const git = simpleGit(options);
-    return await git.branchLocal();
+    // console.log(await git.branch(['-r']));
+    // return await git.branchLocal();
+    return await git.branch();
+  }
+}
+
+async function checkoutBranch(path: string, branch: string) {
+  if (path) {
+    const options = {
+      baseDir: path,
+      binary: 'git',
+      maxConcurrentProcesses: 6,
+      trimmed: false,
+    };
+    const git = simpleGit(options);
+    return await git.checkout(branch);
   }
 }
 
@@ -196,5 +211,13 @@ app.whenReady().then(() => {
     getBranches(path).then((path) => {
       event.sender.send('get-branches-success', path);
     });
+  });
+
+  ipcMain.on('checkout-branch', (_event, path, branch) => {
+    console.log(path, branch);
+    checkoutBranch(path, branch);
+    // checkoutBranch(path).then((path) => {
+    //   event.sender.send('get-branches-success', path);
+    // });
   });
 });
