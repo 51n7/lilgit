@@ -69,9 +69,8 @@ const App = () => {
     };
     window.addEventListener('keyup', handleKeyUp);
 
-    // clean up the event listener on unmount
     return () => {
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('keyup', handleKeyUp); // clean up the event listener on unmount
     };
   }, [viewState, views.length]);
 

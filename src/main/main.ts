@@ -127,8 +127,6 @@ async function getBranches(path: string) {
       trimmed: false,
     };
     const git = simpleGit(options);
-    // console.log(await git.branch(['-r']));
-    // return await git.branchLocal();
     return await git.branch();
   }
 }

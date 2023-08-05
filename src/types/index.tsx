@@ -10,6 +10,24 @@ export type RepoProps = {
   branches?: BranchSummary;
 };
 
+export type TransformBranch = {
+  id: number;
+  current: boolean;
+  name: string;
+  commit: string;
+  label: string;
+};
+
+export type TransformBranches = {
+  local?: TransformBranch[];
+  [remoteName: string]: TransformBranch[] | undefined;
+};
+
+export type ListItem = {
+  id: number;
+  text: string;
+};
+
 // export type BranchInfo = {
 //   current: boolean;
 //   linkedWorkTree: boolean;
