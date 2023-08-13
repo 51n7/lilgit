@@ -26,6 +26,7 @@ function NavigableList({
             }}
           >
             {item.name}
+            {item.current ? '*' : ''}
           </li>
         ))}
     </ul>

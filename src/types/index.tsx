@@ -8,6 +8,7 @@ export type RepoPathProp = {
 export type RepoProps = {
   currentRepo?: string;
   branches?: BranchSummary;
+  onBranchSelect?: (item: TransformBranch | undefined) => void;
 };
 
 export type TransformBranch = {

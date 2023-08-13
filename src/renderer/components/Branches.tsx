@@ -6,8 +6,8 @@ import {
   transformBranch,
 } from '../../../src/helpers/branches.helpers';
 
-function Branches({ currentRepo, branches }: RepoProps) {
-  const [testIndex, setTestIndex] = useState<number | null>(null);
+function Branches({ currentRepo, branches, onBranchSelect }: RepoProps) {
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const transformBranches = branches ? transformBranch(branches) : null;
   const branchesLength = branches
     ? Object.keys(branches.branches).length
@@ -15,7 +15,7 @@ function Branches({ currentRepo, branches }: RepoProps) {
 
   const handleItemClick = (item: TransformBranch) => {
     console.log('Selected item:', item.name);
-    setTestIndex(item.id);
+    setSelectedIndex(item.id);
   };
 
   const keyMap = useMemo(
@@ -23,22 +23,18 @@ function Branches({ currentRepo, branches }: RepoProps) {
       {
         key: 's',
         function: () => {
-          console.log('s key was hit in branch');
+          console.log('s key was hit in branch view');
         },
       },
       {
         key: 'a',
         function: () => {
-          console.log('a key was hit in branch');
+          console.log('a key was hit in branch view');
         },
       },
     ],
     [],
   );
-
-  async function checkoutBranch(branch: string) {
-    await window.api.checkoutBranch(currentRepo, branch);
-  }
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -51,7 +47,7 @@ function Branches({ currentRepo, branches }: RepoProps) {
 
       if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
         event.preventDefault();
-        setTestIndex((prevIndex) => {
+        setSelectedIndex((prevIndex) => {
           if (prevIndex === null || prevIndex === 0) {
             return branchLength - 1;
           } else {
@@ -60,7 +56,7 @@ function Branches({ currentRepo, branches }: RepoProps) {
         });
       } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
         event.preventDefault();
-        setTestIndex((prevIndex) => {
+        setSelectedIndex((prevIndex) => {
           if (prevIndex === null || prevIndex === branchLength - 1) {
             return 0;
           } else {
@@ -69,8 +65,15 @@ function Branches({ currentRepo, branches }: RepoProps) {
         });
       } else if (event.key === 'Enter') {
         event.preventDefault();
-        if (testIndex !== null) {
-          console.log(findBranchById(transformBranches, testIndex));
+        if (selectedIndex !== null) {
+          const selectedBranch = findBranchById(
+            transformBranches,
+            selectedIndex,
+          );
+
+          if (onBranchSelect) {
+            onBranchSelect(selectedBranch);
+          }
         }
       }
     };
@@ -78,11 +81,18 @@ function Branches({ currentRepo, branches }: RepoProps) {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [keyMap, testIndex, transformBranches, branchesLength]);
+  }, [
+    keyMap,
+    selectedIndex,
+    transformBranches,
+    branchesLength,
+    onBranchSelect,
+  ]);
 
   return (
     <div>
       <h1>Branches</h1>
+      <p>Repo: {currentRepo}</p>
       <p>Current: {branches?.current}</p>
       <br />
       <hr />
@@ -91,12 +101,13 @@ function Branches({ currentRepo, branches }: RepoProps) {
       {transformBranches &&
         Object.keys(transformBranches).map((section) => (
           <div key={section}>
-            <h2>{section}</h2>
+            <h2>{section === 'local' ? section : `remote: ${section}`}</h2>
             <NavigableList
               items={transformBranches[section]}
-              selectedIndex={testIndex}
+              selectedIndex={selectedIndex}
               onItemClick={handleItemClick}
             />
+            <br />
           </div>
         ))}
     </div>

@@ -12,7 +12,11 @@ const App = () => {
   const [viewState, setViewState] = useState<number>(0);
   const views = [
     <Status currentRepo={currentRepo} />,
-    <Branches currentRepo={currentRepo} branches={branchList} />,
+    <Branches
+      currentRepo={currentRepo}
+      branches={branchList}
+      onBranchSelect={updateBranches}
+    />,
     <Graph />,
   ];
 
@@ -34,6 +38,11 @@ const App = () => {
     window.api.removeCurrent();
   }
 
+  async function updateBranches(item: any) {
+    window.api.checkoutBranch(currentRepo, item.name);
+    setBranchList(await window.api.getBranches(currentRepo));
+  }
+
   async function folderSelect() {
     const newRepo = await window.api.getPath();
 
@@ -46,10 +55,10 @@ const App = () => {
   useEffect(() => {
     const fetchRepos = async () => {
       try {
-        const current = await window.api.getCurrent();
-        setCurrentRepo(current);
+        const repo = await window.api.getCurrent();
+        setCurrentRepo(repo);
         setRepoList(await window.api.getRepos());
-        setBranchList(await window.api.getBranches(current));
+        setBranchList(await window.api.getBranches(repo));
       } catch (error) {
         console.error('Error fetching:', error);
       }

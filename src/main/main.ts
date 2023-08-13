@@ -214,8 +214,9 @@ app.whenReady().then(() => {
   ipcMain.on('checkout-branch', (_event, path, branch) => {
     console.log(path, branch);
     checkoutBranch(path, branch);
-    // checkoutBranch(path).then((path) => {
-    //   event.sender.send('get-branches-success', path);
+    // checkoutBranch(path, branch).then((path) => {
+    //   // event.sender.send('get-branches-success', path);
+    //   console.log(path);
     // });
   });
 });
