@@ -38,7 +38,7 @@ function Status({ currentRepo }: RepoProps) {
   }, [keyMap]);
 
   return (
-    <div>
+    <div className='view-status'>
       <h1>Status</h1>
       <p>Current Repo: {currentRepo}</p>
     </div>

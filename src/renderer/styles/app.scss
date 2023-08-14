@@ -1,20 +1,24 @@
 @import './reset.scss';
 
+@font-face {
+  font-family: 'Menlo';
+  src: url('../fonts/Menlo-Regular.woff2') format('woff2'),
+    url('../fonts/Menlo-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 body {
   background-color: #1a1a1a;
   color: #dfe5ff;
+  font-family: 'Menlo';
 }
 
 html,
 body,
 #app {
-  height: 100%;
-}
-
-#app {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  min-height: 100vh;
 }
 
 h1 {
@@ -46,13 +50,48 @@ button {
   cursor: pointer;
 }
 
-.repo-list {
+.repo-container {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.repo-list {
+  border: 1px solid #575757;
+  padding: 1.5rem;
+  border-radius: 4px;
+}
+
+.view-status,
+.view-branches,
+.view-graph {
+  padding: 1.5rem;
 }
 
 .closeRepo {
   position: absolute;
   top: 0;
   right: 0;
+}
+
+.text-red {
+  color: #f36668;
+}
+
+.text-blue {
+  color: #65b7e2;
+}
+
+header {
+  margin-block-end: 1.5rem;
+}
+
+ul {
+  padding-left: 1rem;
+
+  li span {
+    display: inline-block;
+    padding-inline: 0.25rem;
+  }
 }

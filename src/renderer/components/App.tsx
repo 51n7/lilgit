@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { RepoPathProp } from 'src/types';
+import { RepoPathProp, TransformBranch } from 'src/types';
 import { BranchSummary } from 'simple-git';
 import Status from './Status';
 import Branches from './Branches';
@@ -38,8 +38,8 @@ const App = () => {
     window.api.removeCurrent();
   }
 
-  async function updateBranches(item: any) {
-    window.api.checkoutBranch(currentRepo, item.name);
+  async function updateBranches(item: TransformBranch | undefined) {
+    window.api.checkoutBranch(currentRepo, item?.name ?? '');
     setBranchList(await window.api.getBranches(currentRepo));
   }
 
@@ -91,9 +91,9 @@ const App = () => {
   }, [currentRepo]);
 
   return (
-    <div>
+    <>
       {currentRepo && (
-        <div>
+        <>
           {views[viewState]}
           <button
             type='button'
@@ -102,36 +102,38 @@ const App = () => {
           >
             back
           </button>
-        </div>
+        </>
       )}
       {!currentRepo && (
-        <div>
-          {repoList &&
-            repoList.map((type, index) => {
-              return (
-                <div key={type.short} className='repo-list'>
-                  <button
-                    type='button'
-                    onClick={() => saveCurrentRepo(type.absolute)}
-                  >
-                    {type.short}
-                  </button>
-                  <button type='button' onClick={() => deleteRepo(index)}>
-                    x
-                  </button>
-                </div>
-              );
-            })}
+        <div className='repo-container'>
+          <div className='repo-list'>
+            {repoList &&
+              repoList.map((type, index) => {
+                return (
+                  <div key={type.short}>
+                    <button
+                      type='button'
+                      onClick={() => saveCurrentRepo(type.absolute)}
+                    >
+                      {type.short}
+                    </button>
+                    <button type='button' onClick={() => deleteRepo(index)}>
+                      x
+                    </button>
+                  </div>
+                );
+              })}
 
-          <div>
-            <br />
-            <button type='button' onClick={folderSelect}>
-              add repo
-            </button>
+            <div>
+              <br />
+              <button type='button' onClick={folderSelect}>
+                add repo
+              </button>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

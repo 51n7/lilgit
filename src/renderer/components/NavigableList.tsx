@@ -12,21 +12,24 @@ function NavigableList({
   selectedIndex,
 }: NavigableListProps) {
   return (
-    <ul style={{ listStyle: 'none' }}>
+    <ul>
       {items &&
         items.map((item, index) => (
           <li
             key={item.id}
             id={`item-${index}`}
             onClick={() => onItemClick(item)}
-            style={{
-              cursor: 'pointer',
-              backgroundColor:
-                selectedIndex === item.id ? '#b1d' : 'transparent',
-            }}
           >
-            {item.name}
-            {item.current ? '*' : ''}
+            <span
+              style={{
+                cursor: 'pointer',
+                backgroundColor:
+                  selectedIndex === item.id ? '#2f7351' : 'transparent',
+              }}
+            >
+              {item.name}
+              {item.current ? '*' : ''}
+            </span>
           </li>
         ))}
     </ul>

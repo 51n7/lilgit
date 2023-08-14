@@ -90,18 +90,23 @@ function Branches({ currentRepo, branches, onBranchSelect }: RepoProps) {
   ]);
 
   return (
-    <div>
-      <h1>Branches</h1>
-      <p>Repo: {currentRepo}</p>
-      <p>Current: {branches?.current}</p>
-      <br />
-      <hr />
-      <br />
+    <div className='view-branches'>
+      <header>
+        <p>
+          <em>Repo:</em> {currentRepo}
+        </p>
+        <p>
+          <em>Branch:</em> On branch{' '}
+          <span className='text-blue'>`{branches?.current}`</span>
+        </p>
+      </header>
 
       {transformBranches &&
         Object.keys(transformBranches).map((section) => (
           <div key={section}>
-            <h2>{section === 'local' ? section : `remote: ${section}`}</h2>
+            <p className='text-red'>
+              {section === 'local' ? 'LOCAL:' : `REMOTE (${section}):`}
+            </p>
             <NavigableList
               items={transformBranches[section]}
               selectedIndex={selectedIndex}
