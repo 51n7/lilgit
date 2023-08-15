@@ -140,7 +140,8 @@ async function checkoutBranch(path: string, branch: string) {
       trimmed: false,
     };
     const git = simpleGit(options);
-    return await git.checkout(branch);
+    await git.checkout(branch);
+    return await git.branch();
   }
 }
 
@@ -211,12 +212,9 @@ app.whenReady().then(() => {
     });
   });
 
-  ipcMain.on('checkout-branch', (_event, path, branch) => {
-    console.log(path, branch);
-    checkoutBranch(path, branch);
-    // checkoutBranch(path, branch).then((path) => {
-    //   // event.sender.send('get-branches-success', path);
-    //   console.log(path);
-    // });
+  ipcMain.on('checkout-branch', (event, path, branch) => {
+    checkoutBranch(path, branch).then((path) => {
+      event.sender.send('checkout-branch-success', path);
+    });
   });
 });

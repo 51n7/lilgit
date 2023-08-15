@@ -39,8 +39,9 @@ const App = () => {
   }
 
   async function updateBranches(item: TransformBranch | undefined) {
-    window.api.checkoutBranch(currentRepo, item?.name ?? '');
-    setBranchList(await window.api.getBranches(currentRepo));
+    setBranchList(
+      await window.api.checkoutBranch(currentRepo, item?.name ?? ''),
+    );
   }
 
   async function folderSelect() {
