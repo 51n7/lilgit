@@ -8,12 +8,12 @@ import Graph from './Graph';
 const App = () => {
   const [repoList, setRepoList] = useState<RepoPathProp[]>([]);
   const [branchList, setBranchList] = useState<BranchSummary>();
-  const [currentRepo, setCurrentRepo] = useState<string | undefined>();
+  const [currentRepo, setCurrentRepo] = useState<RepoPathProp | undefined>();
   const [viewState, setViewState] = useState<number>(0);
   const views = [
-    <Status currentRepo={currentRepo} />,
+    <Status currentRepo={currentRepo?.short} />,
     <Branches
-      currentRepo={currentRepo}
+      currentRepo={currentRepo?.short}
       branches={branchList}
       onBranchSelect={updateBranches}
     />,
@@ -28,9 +28,9 @@ const App = () => {
     await window.api.deleteRepo(index);
   }
 
-  async function saveCurrentRepo(path: string) {
-    setCurrentRepo(path);
-    await window.api.saveCurrent(path);
+  async function saveCurrentRepo(repo: RepoPathProp) {
+    setCurrentRepo(repo);
+    await window.api.saveCurrent(repo);
   }
 
   function removeCurrentRepo() {
@@ -40,7 +40,7 @@ const App = () => {
 
   async function updateBranches(item: TransformBranch | undefined) {
     setBranchList(
-      await window.api.checkoutBranch(currentRepo, item?.name ?? ''),
+      await window.api.checkoutBranch(currentRepo?.absolute, item?.name ?? ''),
     );
   }
 
@@ -59,7 +59,7 @@ const App = () => {
         const repo = await window.api.getCurrent();
         setCurrentRepo(repo);
         setRepoList(await window.api.getRepos());
-        setBranchList(await window.api.getBranches(repo));
+        setBranchList(await window.api.getBranches(repo.absolute));
       } catch (error) {
         console.error('Error fetching:', error);
       }
@@ -86,7 +86,7 @@ const App = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setBranchList(await window.api.getBranches(currentRepo));
+      setBranchList(await window.api.getBranches(currentRepo?.absolute));
     };
     fetchData().catch(console.error);
   }, [currentRepo]);
@@ -112,10 +112,7 @@ const App = () => {
               repoList.map((type, index) => {
                 return (
                   <div key={type.short}>
-                    <button
-                      type='button'
-                      onClick={() => saveCurrentRepo(type.absolute)}
-                    >
+                    <button type='button' onClick={() => saveCurrentRepo(type)}>
                       {type.short}
                     </button>
                     <button type='button' onClick={() => deleteRepo(index)}>

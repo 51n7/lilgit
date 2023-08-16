@@ -12,8 +12,8 @@ import { BranchSummary } from 'simple-git';
 // renderer process using `contextBridge`.
 export type ContextBridgeApi = {
   getRepos: () => Promise<RepoPathProp[]>;
-  getCurrent: () => Promise<string>;
-  saveCurrent: (path: string) => Promise<string>;
+  getCurrent: () => Promise<RepoPathProp>;
+  saveCurrent: (path: RepoPathProp) => Promise<RepoPathProp>;
   removeCurrent: () => void;
   deleteRepo: (index: number) => Promise<number>;
   savePath: (path: RepoPathProp) => Promise<RepoPathProp>;
@@ -43,7 +43,7 @@ const exposedApi: ContextBridgeApi = {
     ipcRenderer.send('get-current');
 
     return new Promise((resolve) => {
-      ipcRenderer.once('get-current-success', (_event, data: string) =>
+      ipcRenderer.once('get-current-success', (_event, data: RepoPathProp) =>
         resolve(data),
       );
     });
@@ -53,7 +53,7 @@ const exposedApi: ContextBridgeApi = {
     ipcRenderer.send('set-current', path);
 
     return new Promise((resolve) => {
-      ipcRenderer.once('set-current-success', (_event, data: string) =>
+      ipcRenderer.once('set-current-success', (_event, data: RepoPathProp) =>
         resolve(data),
       );
     });
