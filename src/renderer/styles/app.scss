@@ -61,6 +61,7 @@ button {
   border: 1px solid #575757;
   padding: 1.5rem;
   border-radius: 4px;
+  min-width: 50%;
 }
 
 .view-status,
@@ -87,9 +88,18 @@ header {
   margin-block-end: 1.5rem;
 }
 
-ul {
-  padding-left: 1rem;
+.view-branches {
+  ul {
+    padding-left: 1rem;
 
+    li span {
+      display: inline-block;
+      padding-inline: 0.25rem;
+    }
+  }
+}
+
+ul {
   li span {
     display: inline-block;
     padding-inline: 0.25rem;

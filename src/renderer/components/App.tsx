@@ -4,6 +4,7 @@ import { BranchSummary } from 'simple-git';
 import Status from './Status';
 import Branches from './Branches';
 import Graph from './Graph';
+import RepoList from './RepoList';
 
 const App = () => {
   const [repoList, setRepoList] = useState<RepoPathProp[]>([]);
@@ -59,7 +60,7 @@ const App = () => {
         const repo = await window.api.getCurrent();
         setCurrentRepo(repo);
         setRepoList(await window.api.getRepos());
-        setBranchList(await window.api.getBranches(repo.absolute));
+        setBranchList(await window.api.getBranches(repo?.absolute));
       } catch (error) {
         console.error('Error fetching:', error);
       }
@@ -75,6 +76,9 @@ const App = () => {
       }
       if (e.shiftKey && e.code == 'Tab') {
         setViewState(viewState === 0 ? views.length - 1 : viewState - 1);
+      }
+      if (e.code == 'Escape') {
+        removeCurrentRepo();
       }
     };
     window.addEventListener('keyup', handleKeyUp);
@@ -93,34 +97,15 @@ const App = () => {
 
   return (
     <>
-      {currentRepo && (
-        <>
-          {views[viewState]}
-          <button
-            type='button'
-            className='closeRepo'
-            onClick={() => removeCurrentRepo()}
-          >
-            back
-          </button>
-        </>
-      )}
+      {currentRepo && <>{views[viewState]}</>}
       {!currentRepo && (
         <div className='repo-container'>
           <div className='repo-list'>
-            {repoList &&
-              repoList.map((type, index) => {
-                return (
-                  <div key={type.short}>
-                    <button type='button' onClick={() => saveCurrentRepo(type)}>
-                      {type.short}
-                    </button>
-                    <button type='button' onClick={() => deleteRepo(index)}>
-                      x
-                    </button>
-                  </div>
-                );
-              })}
+            <RepoList
+              list={repoList}
+              onRepoSave={saveCurrentRepo}
+              onRepoDelete={deleteRepo}
+            />
 
             <div>
               <br />
