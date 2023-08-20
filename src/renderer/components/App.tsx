@@ -22,11 +22,13 @@ const App = () => {
   ];
 
   async function deleteRepo(index: number) {
-    const tmpArray = [...repoList];
-    tmpArray.splice(index, 1);
-    setRepoList(tmpArray);
+    if (index > 0) {
+      const tmpArray = [...repoList];
+      tmpArray.splice(index, 1);
+      setRepoList(tmpArray);
 
-    await window.api.deleteRepo(index);
+      await window.api.deleteRepo(index);
+    }
   }
 
   async function saveCurrentRepo(repo: RepoPathProp) {
@@ -79,6 +81,7 @@ const App = () => {
       }
       if (e.code == 'Escape') {
         removeCurrentRepo();
+        // console.log('Escape');
       }
     };
     window.addEventListener('keyup', handleKeyUp);
@@ -105,14 +108,15 @@ const App = () => {
               list={repoList}
               onRepoSave={saveCurrentRepo}
               onRepoDelete={deleteRepo}
+              addRepo={folderSelect}
             />
 
-            <div>
+            {/* <div>
               <br />
               <button type='button' onClick={folderSelect}>
                 add repo
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       )}

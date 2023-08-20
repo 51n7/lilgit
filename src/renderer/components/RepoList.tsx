@@ -1,14 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { RepoPathProp } from 'src/types';
+import Menu from './Menu';
 
 type RepoListProps = {
   onRepoSave: (item: RepoPathProp) => void;
   onRepoDelete: (item: number) => void;
+  addRepo: () => void;
   list: RepoPathProp[];
 };
 
-function RepoList({ onRepoSave, onRepoDelete, list }: RepoListProps) {
+function RepoList({ onRepoSave, onRepoDelete, addRepo, list }: RepoListProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [showMenu, setShowMenu] = useState<boolean>(false);
 
   const handleItemClick = (item: number) => {
     setSelectedIndex(item);
@@ -17,27 +20,41 @@ function RepoList({ onRepoSave, onRepoDelete, list }: RepoListProps) {
   const keyMap = useMemo(
     () => [
       {
-        key: 's',
+        key: 'a',
+        description: 'add',
         function: () => {
-          console.log('s key was hit in repo view');
+          addRepo();
+          console.log('a key was hit in repo view');
         },
       },
       {
         key: 'd',
+        description: 'delete',
         function: () => {
           onRepoDelete(selectedIndex ?? 0);
+          console.log('d key was hit in repo view');
+        },
+      },
+      {
+        key: 'escape',
+        function: () => {
+          setShowMenu(false);
+
+          if (!showMenu) {
+            setSelectedIndex(null);
+          }
         },
       },
       {
         key: 'enter',
         function: () => {
-          if (selectedIndex !== null) {
+          if (selectedIndex !== null && !showMenu) {
             onRepoSave(list[selectedIndex]);
           }
         },
       },
     ],
-    [list, selectedIndex, onRepoSave, onRepoDelete],
+    [list, selectedIndex, onRepoSave, onRepoDelete, addRepo, showMenu],
   );
 
   useEffect(() => {
@@ -51,48 +68,53 @@ function RepoList({ onRepoSave, onRepoDelete, list }: RepoListProps) {
 
       if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
         event.preventDefault();
-        setSelectedIndex((prevIndex) => {
-          if (prevIndex === null || prevIndex === 0) {
-            return repoLength - 1;
-          } else {
-            return prevIndex - 1;
-          }
-        });
+        if (!showMenu) {
+          setSelectedIndex((prevIndex) => {
+            return prevIndex === null || prevIndex === 0
+              ? repoLength - 1
+              : prevIndex - 1;
+          });
+        }
       } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
         event.preventDefault();
-        setSelectedIndex((prevIndex) => {
-          if (prevIndex === null || prevIndex === repoLength - 1) {
-            return 0;
-          } else {
-            return prevIndex + 1;
-          }
-        });
+        if (!showMenu) {
+          setSelectedIndex((prevIndex) => {
+            return prevIndex === null || prevIndex === repoLength - 1
+              ? 0
+              : prevIndex + 1;
+          });
+        }
+      } else if (event.shiftKey && event.code == 'Slash') {
+        setShowMenu((showMenu) => !showMenu);
       }
     };
     window.addEventListener('keydown', handleKeyPress);
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [keyMap, list]);
+  }, [keyMap, list, showMenu]);
 
   return (
-    <ul>
-      {list &&
-        list.map((item, index) => (
-          <li key={item.short} id={`item-${index}`}>
-            <span
-              onClick={() => handleItemClick(index)}
-              style={{
-                cursor: 'pointer',
-                backgroundColor:
-                  selectedIndex === index ? '#2f7351' : 'transparent',
-              }}
-            >
-              {item.short}
-            </span>
-          </li>
-        ))}
-    </ul>
+    <>
+      <ul>
+        {list &&
+          list.map((item, index) => (
+            <li key={item.short} id={`item-${index}`}>
+              <span
+                onClick={() => handleItemClick(index)}
+                style={{
+                  cursor: 'pointer',
+                  backgroundColor:
+                    selectedIndex === index ? '#2f7351' : 'transparent',
+                }}
+              >
+                {item.short}
+              </span>
+            </li>
+          ))}
+      </ul>
+      <Menu options={keyMap} isOpen={showMenu} />
+    </>
   );
 }
 
