@@ -12,7 +12,7 @@ const App = () => {
   const [currentRepo, setCurrentRepo] = useState<RepoPathProp | undefined>();
   const [viewState, setViewState] = useState<number>(0);
   const views = [
-    <Status currentRepo={currentRepo?.short} />,
+    <Status currentRepo={currentRepo?.short} branches={branchList} />,
     <Branches
       currentRepo={currentRepo?.short}
       branches={branchList}
@@ -100,25 +100,14 @@ const App = () => {
 
   return (
     <>
-      {currentRepo && <>{views[viewState]}</>}
+      {currentRepo && views[viewState]}
       {!currentRepo && (
-        <div className='repo-container'>
-          <div className='repo-list'>
-            <RepoList
-              list={repoList}
-              onRepoSave={saveCurrentRepo}
-              onRepoDelete={deleteRepo}
-              addRepo={folderSelect}
-            />
-
-            {/* <div>
-              <br />
-              <button type='button' onClick={folderSelect}>
-                add repo
-              </button>
-            </div> */}
-          </div>
-        </div>
+        <RepoList
+          list={repoList}
+          onRepoSave={saveCurrentRepo}
+          onRepoDelete={deleteRepo}
+          addRepo={folderSelect}
+        />
       )}
     </>
   );

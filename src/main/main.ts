@@ -1,9 +1,9 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'path';
 import os from 'os';
-import { simpleGit } from 'simple-git';
+import { simpleGit, StatusResult } from 'simple-git';
 import Store from 'electron-store'; // https://github.com/sindresorhus/electron-store
-import { RepoPathProp } from 'src/types';
+import { RepoPathProp, TransformedStatus } from 'src/types';
 
 /** Handle creating/removing shortcuts on Windows when installing/uninstalling. */
 if (require('electron-squirrel-startup')) {
@@ -131,6 +131,48 @@ async function getBranches(path: string) {
   }
 }
 
+function convertGitResponse(response: StatusResult): TransformedStatus {
+  const transformedResponse: TransformedStatus = {
+    unstaged: [],
+    untracked: [],
+    staged: [],
+  };
+
+  response.files.forEach((file) => {
+    if (file.working_dir === 'M') {
+      if (response.modified.includes(file.path)) {
+        transformedResponse.unstaged.push({
+          id: transformedResponse.unstaged.length,
+          path: file.path,
+          status: 'M',
+        });
+      }
+    } else if (file.index === 'M') {
+      if (response.staged.includes(file.path)) {
+        transformedResponse.staged.push({
+          id: transformedResponse.staged.length,
+          path: file.path,
+          status: 'M',
+        });
+      }
+    } else if (file.working_dir === 'D') {
+      transformedResponse.unstaged.push({
+        id: transformedResponse.unstaged.length,
+        path: file.path,
+        status: 'D',
+      });
+    } else if (file.working_dir === '?') {
+      transformedResponse.untracked.push({
+        id: transformedResponse.untracked.length,
+        path: file.path,
+        status: '?',
+      });
+    }
+  });
+
+  return transformedResponse;
+}
+
 async function checkoutBranch(path: string, branch: string) {
   if (path) {
     const options = {
@@ -141,6 +183,8 @@ async function checkoutBranch(path: string, branch: string) {
     };
     const git = simpleGit(options);
     await git.checkout(branch);
+    // console.log(convertGitResponse(await git.status()));
+    // console.log(await git.status());
     return await git.branch();
   }
 }

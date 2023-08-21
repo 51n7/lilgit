@@ -29,6 +29,18 @@ export type ListItem = {
   text: string;
 };
 
+export type GitItem = {
+  id: number;
+  path: string;
+  status: string;
+};
+
+export type TransformedStatus = {
+  unstaged: GitItem[];
+  untracked: GitItem[];
+  staged: GitItem[];
+};
+
 // export type BranchInfo = {
 //   current: boolean;
 //   linkedWorkTree: boolean;

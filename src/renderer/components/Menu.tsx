@@ -49,20 +49,24 @@ function Menu({ options, isOpen }: MenuProps) {
 
   return (
     isOpen && (
-      <div>
-        {objectsWithDescription.map((item, index) => (
-          <div
-            key={item.key}
-            onClick={() => setMenuIndex(index)}
-            style={{
-              cursor: 'pointer',
-              backgroundColor: menuIndex === index ? '#2f7351' : 'transparent',
-            }}
-          >
-            {item.description} - {item.key}
-          </div>
-        ))}
-      </div>
+      <nav>
+        <fieldset className='menu'>
+          <legend>Menu</legend>
+          {objectsWithDescription.map((item, index) => (
+            <div
+              key={item.key}
+              onClick={() => setMenuIndex(index)}
+              style={{
+                cursor: 'pointer',
+                backgroundColor:
+                  menuIndex === index ? '#2f7351' : 'transparent',
+              }}
+            >
+              {item.key} {item.description}
+            </div>
+          ))}
+        </fieldset>
+      </nav>
     )
   );
 }

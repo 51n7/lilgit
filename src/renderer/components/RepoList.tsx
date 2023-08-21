@@ -24,6 +24,7 @@ function RepoList({ onRepoSave, onRepoDelete, addRepo, list }: RepoListProps) {
         description: 'add',
         function: () => {
           addRepo();
+          setShowMenu(false);
           console.log('a key was hit in repo view');
         },
       },
@@ -32,6 +33,8 @@ function RepoList({ onRepoSave, onRepoDelete, addRepo, list }: RepoListProps) {
         description: 'delete',
         function: () => {
           onRepoDelete(selectedIndex ?? 0);
+          setShowMenu(false);
+          setSelectedIndex(null);
           console.log('d key was hit in repo view');
         },
       },
@@ -95,26 +98,28 @@ function RepoList({ onRepoSave, onRepoDelete, addRepo, list }: RepoListProps) {
   }, [keyMap, list, showMenu]);
 
   return (
-    <>
-      <ul>
-        {list &&
-          list.map((item, index) => (
-            <li key={item.short} id={`item-${index}`}>
-              <span
-                onClick={() => handleItemClick(index)}
-                style={{
-                  cursor: 'pointer',
-                  backgroundColor:
-                    selectedIndex === index ? '#2f7351' : 'transparent',
-                }}
-              >
-                {item.short}
-              </span>
-            </li>
-          ))}
-      </ul>
+    <div className='repo-container'>
+      <div className='repo-list'>
+        <ul>
+          {list &&
+            list.map((item, index) => (
+              <li key={item.short} id={`item-${index}`}>
+                <span
+                  onClick={() => handleItemClick(index)}
+                  style={{
+                    cursor: 'pointer',
+                    backgroundColor:
+                      selectedIndex === index ? '#2f7351' : 'transparent',
+                  }}
+                >
+                  {item.short}
+                </span>
+              </li>
+            ))}
+        </ul>
+      </div>
       <Menu options={keyMap} isOpen={showMenu} />
-    </>
+    </div>
   );
 }
 
