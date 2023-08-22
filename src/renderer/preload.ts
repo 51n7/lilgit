@@ -6,7 +6,7 @@
 // whitelisted wrappers to increase the security of our aplication.
 import { contextBridge, ipcRenderer } from 'electron';
 import { RepoPathProp } from 'src/types';
-import { BranchSummary } from 'simple-git';
+import { BranchSummary, StatusResult } from 'simple-git';
 
 // Create a type that should contain all the data we need to expose in the
 // renderer process using `contextBridge`.
@@ -23,6 +23,7 @@ export type ContextBridgeApi = {
     path: string | undefined,
     branch: string,
   ) => Promise<BranchSummary>;
+  getStatus: (path: string | undefined) => Promise<StatusResult>;
 };
 
 const exposedApi: ContextBridgeApi = {
@@ -110,6 +111,18 @@ const exposedApi: ContextBridgeApi = {
       ipcRenderer.once(
         'checkout-branch-success',
         (_event, data: BranchSummary) => resolve(data),
+      );
+    });
+  },
+
+  getStatus: (path) => {
+    // <--
+    ipcRenderer.send('get-status', path);
+
+    // -->
+    return new Promise((resolve) => {
+      ipcRenderer.once('get-status-success', (_event, data: StatusResult) =>
+        resolve(data),
       );
     });
   },

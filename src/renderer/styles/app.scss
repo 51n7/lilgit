@@ -21,6 +21,10 @@ body,
   min-height: 100vh;
 }
 
+.pad {
+  padding: 1.5rem;
+}
+
 h1 {
   text-align: center;
   margin: 1rem 0;
@@ -64,11 +68,11 @@ button {
   min-width: 50%;
 }
 
-.view-status,
-.view-branches,
-.view-graph {
-  padding: 1.5rem;
-}
+// .view-status,
+// .view-branches,
+// .view-graph {
+//   padding: 1.5rem;
+// }
 
 .closeRepo {
   position: absolute;

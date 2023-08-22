@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { RepoPathProp, TransformBranch } from 'src/types';
-import { BranchSummary } from 'simple-git';
+import { StatusResult, BranchSummary } from 'simple-git';
 import Status from './Status';
 import Branches from './Branches';
 import Graph from './Graph';
@@ -8,16 +8,13 @@ import RepoList from './RepoList';
 
 const App = () => {
   const [repoList, setRepoList] = useState<RepoPathProp[]>([]);
-  const [branchList, setBranchList] = useState<BranchSummary>();
   const [currentRepo, setCurrentRepo] = useState<RepoPathProp | undefined>();
+  const [status, setStatus] = useState<StatusResult>();
+  const [branchList, setBranchList] = useState<BranchSummary>();
   const [viewState, setViewState] = useState<number>(0);
   const views = [
-    <Status currentRepo={currentRepo?.short} branches={branchList} />,
-    <Branches
-      currentRepo={currentRepo?.short}
-      branches={branchList}
-      onBranchSelect={updateBranches}
-    />,
+    <Status />,
+    <Branches branches={branchList} onBranchSelect={updateBranches} />,
     <Graph />,
   ];
 
@@ -60,12 +57,14 @@ const App = () => {
     const fetchRepos = async () => {
       try {
         const repo = await window.api.getCurrent();
-        setCurrentRepo(repo);
+        setCurrentRepo(await window.api.getCurrent());
         setRepoList(await window.api.getRepos());
         setBranchList(await window.api.getBranches(repo?.absolute));
+        setStatus(await window.api.getStatus(repo?.absolute));
       } catch (error) {
         console.error('Error fetching:', error);
       }
+      console.log('load once');
     };
 
     fetchRepos();
@@ -81,7 +80,6 @@ const App = () => {
       }
       if (e.code == 'Escape') {
         removeCurrentRepo();
-        // console.log('Escape');
       }
     };
     window.addEventListener('keyup', handleKeyUp);
@@ -94,13 +92,32 @@ const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       setBranchList(await window.api.getBranches(currentRepo?.absolute));
+      setStatus(await window.api.getStatus(currentRepo?.absolute));
+
+      console.log('currentRepo change');
     };
     fetchData().catch(console.error);
   }, [currentRepo]);
 
   return (
     <>
-      {currentRepo && views[viewState]}
+      {currentRepo && (
+        <div className='pad'>
+          <header>
+            <p>
+              <em>Repo:</em> {currentRepo.short}
+            </p>
+            {status?.current && (
+              <p>
+                <em>Branch:</em> On branch{' '}
+                <span className='text-blue'>`{status?.current}`</span> tracking{' '}
+                <span className='text-blue'>`{status?.tracking}`</span>
+              </p>
+            )}
+          </header>
+          {views[viewState]}
+        </div>
+      )}
       {!currentRepo && (
         <RepoList
           list={repoList}

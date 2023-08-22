@@ -138,34 +138,44 @@ function convertGitResponse(response: StatusResult): TransformedStatus {
     staged: [],
   };
 
+  // TODO: add ['conflicted', 'created', 'renamed']
+
   response.files.forEach((file) => {
-    if (file.working_dir === 'M') {
-      if (response.modified.includes(file.path)) {
-        transformedResponse.unstaged.push({
-          id: transformedResponse.unstaged.length,
-          path: file.path,
-          status: 'M',
-        });
-      }
-    } else if (file.index === 'M') {
-      if (response.staged.includes(file.path)) {
-        transformedResponse.staged.push({
-          id: transformedResponse.staged.length,
-          path: file.path,
-          status: 'M',
-        });
-      }
-    } else if (file.working_dir === 'D') {
+    if (
+      response.modified.includes(file.path) &&
+      !response.staged.includes(file.path)
+    ) {
       transformedResponse.unstaged.push({
         id: transformedResponse.unstaged.length,
         path: file.path,
-        status: 'D',
+        status: file.working_dir,
       });
-    } else if (file.working_dir === '?') {
+    }
+
+    if (
+      response.deleted.includes(file.path) &&
+      !response.staged.includes(file.path)
+    ) {
+      transformedResponse.unstaged.push({
+        id: transformedResponse.unstaged.length,
+        path: file.path,
+        status: file.working_dir,
+      });
+    }
+
+    if (response.not_added.includes(file.path)) {
       transformedResponse.untracked.push({
         id: transformedResponse.untracked.length,
         path: file.path,
-        status: '?',
+        status: file.working_dir,
+      });
+    }
+
+    if (response.staged.includes(file.path)) {
+      transformedResponse.staged.push({
+        id: transformedResponse.staged.length,
+        path: file.path,
+        status: file.index,
       });
     }
   });
@@ -183,9 +193,22 @@ async function checkoutBranch(path: string, branch: string) {
     };
     const git = simpleGit(options);
     await git.checkout(branch);
-    // console.log(convertGitResponse(await git.status()));
-    // console.log(await git.status());
     return await git.branch();
+  }
+}
+
+async function getStatus(path: string) {
+  if (path) {
+    const options = {
+      baseDir: path,
+      binary: 'git',
+      maxConcurrentProcesses: 6,
+      trimmed: false,
+    };
+    const git = simpleGit(options);
+    // console.log(await git.status());
+    // console.log(convertGitResponse(await git.status()));
+    return await git.status();
   }
 }
 
@@ -259,6 +282,14 @@ app.whenReady().then(() => {
   ipcMain.on('checkout-branch', (event, path, branch) => {
     checkoutBranch(path, branch).then((path) => {
       event.sender.send('checkout-branch-success', path);
+    });
+  });
+
+  ipcMain.on('get-status', (event, path) => {
+    getStatus(path).then((path) => {
+      const cleanResponse = { ...path };
+      delete cleanResponse.isClean;
+      event.sender.send('get-status-success', cleanResponse);
     });
   });
 });

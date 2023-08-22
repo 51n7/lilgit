@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
-import { RepoProps } from 'src/types';
+// import { RepoProps } from 'src/types';
 
-function Status({ currentRepo, branches }: RepoProps) {
+function Status() {
   const keyMap = useMemo(
     () => [
       {
@@ -39,7 +39,7 @@ function Status({ currentRepo, branches }: RepoProps) {
 
   return (
     <div className='view-status'>
-      <header>
+      {/* <header>
         <p>
           <em>Repo:</em> {currentRepo}
         </p>
@@ -47,7 +47,8 @@ function Status({ currentRepo, branches }: RepoProps) {
           <em>Branch:</em> On branch{' '}
           <span className='text-blue'>`{branches?.current}`</span>
         </p>
-      </header>
+      </header> */}
+      status
     </div>
   );
 }

@@ -1,7 +1,7 @@
 const Graph = () => {
   return (
     <div className='view-graph'>
-      <h1>Graph</h1>
+      <p>graph</p>
     </div>
   );
 };

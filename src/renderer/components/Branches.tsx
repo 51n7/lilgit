@@ -6,7 +6,7 @@ import {
   transformBranch,
 } from '../../../src/helpers/branches.helpers';
 
-function Branches({ currentRepo, branches, onBranchSelect }: RepoProps) {
+function Branches({ branches, onBranchSelect }: RepoProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const transformBranches = branches ? transformBranch(branches) : null;
   const branchesLength = branches
@@ -91,7 +91,7 @@ function Branches({ currentRepo, branches, onBranchSelect }: RepoProps) {
 
   return (
     <div className='view-branches'>
-      <header>
+      {/* <header>
         <p>
           <em>Repo:</em> {currentRepo}
         </p>
@@ -99,7 +99,7 @@ function Branches({ currentRepo, branches, onBranchSelect }: RepoProps) {
           <em>Branch:</em> On branch{' '}
           <span className='text-blue'>`{branches?.current}`</span>
         </p>
-      </header>
+      </header> */}
 
       {transformBranches &&
         Object.keys(transformBranches).map((section) => (
