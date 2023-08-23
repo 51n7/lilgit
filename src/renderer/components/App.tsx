@@ -13,7 +13,7 @@ const App = () => {
   const [branchList, setBranchList] = useState<BranchSummary>();
   const [viewState, setViewState] = useState<number>(0);
   const views = [
-    <Status />,
+    <Status status={status} />,
     <Branches branches={branchList} onBranchSelect={updateBranches} />,
     <Graph />,
   ];
@@ -30,6 +30,7 @@ const App = () => {
 
   async function saveCurrentRepo(repo: RepoPathProp) {
     setCurrentRepo(repo);
+    setViewState(0);
     await window.api.saveCurrent(repo);
   }
 
@@ -64,7 +65,6 @@ const App = () => {
       } catch (error) {
         console.error('Error fetching:', error);
       }
-      console.log('load once');
     };
 
     fetchRepos();
@@ -93,8 +93,6 @@ const App = () => {
     const fetchData = async () => {
       setBranchList(await window.api.getBranches(currentRepo?.absolute));
       setStatus(await window.api.getStatus(currentRepo?.absolute));
-
-      console.log('currentRepo change');
     };
     fetchData().catch(console.error);
   }, [currentRepo]);

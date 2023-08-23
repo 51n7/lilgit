@@ -1,9 +1,9 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'path';
 import os from 'os';
-import { simpleGit, StatusResult } from 'simple-git';
+import { simpleGit } from 'simple-git';
 import Store from 'electron-store'; // https://github.com/sindresorhus/electron-store
-import { RepoPathProp, TransformedStatus } from 'src/types';
+import { RepoPathProp } from 'src/types';
 
 /** Handle creating/removing shortcuts on Windows when installing/uninstalling. */
 if (require('electron-squirrel-startup')) {
@@ -129,58 +129,6 @@ async function getBranches(path: string) {
     const git = simpleGit(options);
     return await git.branch();
   }
-}
-
-function convertGitResponse(response: StatusResult): TransformedStatus {
-  const transformedResponse: TransformedStatus = {
-    unstaged: [],
-    untracked: [],
-    staged: [],
-  };
-
-  // TODO: add ['conflicted', 'created', 'renamed']
-
-  response.files.forEach((file) => {
-    if (
-      response.modified.includes(file.path) &&
-      !response.staged.includes(file.path)
-    ) {
-      transformedResponse.unstaged.push({
-        id: transformedResponse.unstaged.length,
-        path: file.path,
-        status: file.working_dir,
-      });
-    }
-
-    if (
-      response.deleted.includes(file.path) &&
-      !response.staged.includes(file.path)
-    ) {
-      transformedResponse.unstaged.push({
-        id: transformedResponse.unstaged.length,
-        path: file.path,
-        status: file.working_dir,
-      });
-    }
-
-    if (response.not_added.includes(file.path)) {
-      transformedResponse.untracked.push({
-        id: transformedResponse.untracked.length,
-        path: file.path,
-        status: file.working_dir,
-      });
-    }
-
-    if (response.staged.includes(file.path)) {
-      transformedResponse.staged.push({
-        id: transformedResponse.staged.length,
-        path: file.path,
-        status: file.index,
-      });
-    }
-  });
-
-  return transformedResponse;
 }
 
 async function checkoutBranch(path: string, branch: string) {

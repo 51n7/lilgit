@@ -24,10 +24,10 @@ export type TransformBranches = {
   [remoteName: string]: TransformBranch[] | undefined;
 };
 
-export type ListItem = {
-  id: number;
-  text: string;
-};
+// export type ListItem = {
+//   id: number;
+//   text: string;
+// };
 
 export type GitItem = {
   id: number;
@@ -36,26 +36,8 @@ export type GitItem = {
 };
 
 export type TransformedStatus = {
-  unstaged: GitItem[];
-  untracked: GitItem[];
-  staged: GitItem[];
+  [key: string]: GitItem[] | undefined;
+  unstaged?: GitItem[];
+  untracked?: GitItem[];
+  staged?: GitItem[];
 };
-
-// export type BranchInfo = {
-//   current: boolean;
-//   linkedWorkTree: boolean;
-//   name: string;
-//   commit: string;
-//   label: string;
-// };
-
-// export type Branches = {
-//   [branchName: string]: BranchInfo;
-// };
-
-// export type RepositoryInfo = {
-//   all: string[];
-//   branches: Branches;
-//   current: string;
-//   detached: boolean;
-// };

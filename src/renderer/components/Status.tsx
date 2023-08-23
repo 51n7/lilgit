@@ -1,7 +1,22 @@
 import { useEffect, useMemo } from 'react';
+import { StatusResult } from 'simple-git';
 // import { RepoProps } from 'src/types';
 
-function Status() {
+import { convertGitResponse } from '../../../src/helpers/status.helpers';
+import StatusList from './StatusList';
+import { GitItem } from 'src/types';
+
+export type StatusProps = {
+  status: StatusResult | undefined;
+};
+
+const handleItemClick = (item: GitItem) => {
+  console.log('Selected item:', item.path);
+};
+
+function Status({ status }: StatusProps) {
+  const transformStatus = convertGitResponse(status);
+
   const keyMap = useMemo(
     () => [
       {
@@ -39,16 +54,18 @@ function Status() {
 
   return (
     <div className='view-status'>
-      {/* <header>
-        <p>
-          <em>Repo:</em> {currentRepo}
-        </p>
-        <p>
-          <em>Branch:</em> On branch{' '}
-          <span className='text-blue'>`{branches?.current}`</span>
-        </p>
-      </header> */}
-      status
+      {transformStatus &&
+        Object.keys(transformStatus).map((section) => (
+          <div key={section}>
+            <p className='text-red'>{section.toUpperCase()}:</p>
+            <StatusList
+              items={transformStatus[section]}
+              selectedIndex={0}
+              onItemClick={handleItemClick}
+            />
+            <br />
+          </div>
+        ))}
     </div>
   );
 }
