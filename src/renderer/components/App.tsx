@@ -87,7 +87,7 @@ const App = () => {
     return () => {
       window.removeEventListener('keyup', handleKeyUp); // clean up the event listener on unmount
     };
-  }, [viewState, views.length]);
+  }, [viewState, views.length, currentRepo]);
 
   useEffect(() => {
     const fetchData = async () => {

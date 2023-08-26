@@ -6,6 +6,7 @@ import {
 } from '../../../src/helpers/status.helpers';
 import StatusList from './StatusList';
 import { GitItem } from 'src/types';
+import Menu from './Menu';
 
 export type StatusProps = {
   status: StatusResult | undefined;
@@ -14,6 +15,7 @@ export type StatusProps = {
 function Status({ status }: StatusProps) {
   const transformStatus = convertGitResponse(status);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [showMenu, setShowMenu] = useState<boolean>(false);
   const totalModified = Object.values(transformStatus).flat().length;
 
   const handleItemClick = (item: GitItem) => {
@@ -24,18 +26,39 @@ function Status({ status }: StatusProps) {
     () => [
       {
         key: 's',
+        description: 'testing the s key',
         function: () => {
           console.log('s key was hit in status view');
         },
       },
       {
         key: 'a',
+        description: 'testing the a key',
         function: () => {
           console.log('a key was hit in status view');
         },
       },
+      {
+        key: 'escape',
+        function: () => {
+          setShowMenu(false);
+
+          if (!showMenu) {
+            setSelectedIndex(null);
+          }
+        },
+      },
+      {
+        key: 'enter',
+        function: () => {
+          // if (selectedIndex !== null && !showMenu) {
+          //   console.log(findFileById(transformStatus, selectedIndex));
+          // }
+        },
+      },
     ],
-    [],
+    [showMenu],
+    // [selectedIndex, showMenu, transformStatus],
   );
 
   useEffect(() => {
@@ -50,28 +73,28 @@ function Status({ status }: StatusProps) {
 
       if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
         event.preventDefault();
-        setSelectedIndex((prevIndex) => {
-          if (prevIndex === null || prevIndex === 0) {
-            return listLength - 1;
-          } else {
-            return prevIndex - 1;
-          }
-        });
+        if (!showMenu) {
+          setSelectedIndex((prevIndex) => {
+            if (prevIndex === null || prevIndex === 0) {
+              return listLength - 1;
+            } else {
+              return prevIndex - 1;
+            }
+          });
+        }
       } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
         event.preventDefault();
-        setSelectedIndex((prevIndex) => {
-          if (prevIndex === null || prevIndex === listLength - 1) {
-            return 0;
-          } else {
-            return prevIndex + 1;
-          }
-        });
-      } else if (event.key === 'Enter') {
-        event.preventDefault();
-
-        if (selectedIndex !== null) {
-          console.log(findFileById(transformStatus, selectedIndex));
+        if (!showMenu) {
+          setSelectedIndex((prevIndex) => {
+            if (prevIndex === null || prevIndex === listLength - 1) {
+              return 0;
+            } else {
+              return prevIndex + 1;
+            }
+          });
         }
+      } else if (event.shiftKey && event.code == 'Slash') {
+        setShowMenu((showMenu) => !showMenu);
       }
     };
 
@@ -80,7 +103,7 @@ function Status({ status }: StatusProps) {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [keyMap, totalModified, transformStatus, selectedIndex]);
+  }, [keyMap, totalModified, transformStatus, selectedIndex, showMenu]);
 
   return (
     <div className='view-status'>
@@ -96,6 +119,7 @@ function Status({ status }: StatusProps) {
             <br />
           </div>
         ))}
+      <Menu options={keyMap} isOpen={showMenu} />
     </div>
   );
 }
