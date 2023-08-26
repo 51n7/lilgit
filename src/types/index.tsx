@@ -30,7 +30,7 @@ export type TransformBranches = {
 // };
 
 export type GitItem = {
-  id: number;
+  id?: number;
   path: string;
   status: string;
 };

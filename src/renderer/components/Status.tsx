@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { StatusResult } from 'simple-git';
-
-import { convertGitResponse } from '../../../src/helpers/status.helpers';
+import {
+  convertGitResponse,
+  findFileById,
+} from '../../../src/helpers/status.helpers';
 import StatusList from './StatusList';
 import { GitItem } from 'src/types';
 
@@ -9,14 +11,14 @@ export type StatusProps = {
   status: StatusResult | undefined;
 };
 
-const handleItemClick = (item: GitItem) => {
-  console.log('Selected item:', item.path);
-};
-
 function Status({ status }: StatusProps) {
   const transformStatus = convertGitResponse(status);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const totalModified = Object.values(transformStatus).flat().length;
+
+  const handleItemClick = (item: GitItem) => {
+    setSelectedIndex(item.id ?? 0);
+  };
 
   const keyMap = useMemo(
     () => [
@@ -66,7 +68,10 @@ function Status({ status }: StatusProps) {
         });
       } else if (event.key === 'Enter') {
         event.preventDefault();
-        console.log('Enter');
+
+        if (selectedIndex !== null) {
+          console.log(findFileById(transformStatus, selectedIndex));
+        }
       }
     };
 
@@ -75,7 +80,7 @@ function Status({ status }: StatusProps) {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [keyMap, totalModified]);
+  }, [keyMap, totalModified, transformStatus, selectedIndex]);
 
   return (
     <div className='view-status'>
