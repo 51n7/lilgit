@@ -101,6 +101,11 @@ const App = () => {
     <>
       {currentRepo && (
         <div className='pad'>
+          <div className='dot-nav' data-view={viewState + 1}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
           <header>
             <p>
               <em>Repo:</em> {currentRepo.short}
