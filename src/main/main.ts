@@ -62,7 +62,7 @@ function createMainWindow(): BrowserWindow {
   mainWindow = new BrowserWindow({
     width: 860,
     height: 600,
-    backgroundColor: '#202020',
+    backgroundColor: '#22272e',
     show: false,
     autoHideMenuBar: true,
     icon: path.resolve('assets/favicon.ico'),

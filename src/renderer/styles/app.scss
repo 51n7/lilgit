@@ -9,8 +9,16 @@
   font-display: swap;
 }
 
+$bg: #22272e;
+$white: #acb9c6;
+$grey-light: #adbac7;
+$grey: #768390;
+$red: #f47067;
+// $blue-light: #6bb5fd;
+$blue: #6cb6ff;
+
 body {
-  background-color: #1a1a1a;
+  background-color: $bg;
   color: #dfe5ff;
   font-family: 'Menlo';
 }
@@ -31,27 +39,17 @@ h1 {
   font-size: 2.5rem;
 }
 
-.teaser {
-  font-size: 18px;
-  color: gray;
-  text-align: center;
-
-  &.light {
-    margin-top: 5px;
-  }
-
-  span {
-    background: rgb(48, 48, 48);
-    padding: 3px 8px;
-    border-radius: 4px;
-    color: #a2a2aa;
-    font-size: 17px;
-  }
-}
-
 button {
   padding: 0.5em 1em;
   cursor: pointer;
+}
+
+.text-red {
+  color: $red;
+}
+
+.text-blue {
+  color: $blue;
 }
 
 .repo-container {
@@ -62,30 +60,16 @@ button {
 }
 
 .repo-list {
-  border: 1px solid #575757;
+  border: 1px solid $grey;
   padding: 1.5rem;
   border-radius: 4px;
   min-width: 50%;
 }
 
-// .view-status,
-// .view-branches,
-// .view-graph {
-//   padding: 1.5rem;
-// }
-
 .closeRepo {
   position: absolute;
   top: 0;
   right: 0;
-}
-
-.text-red {
-  color: #f36668;
-}
-
-.text-blue {
-  color: #65b7e2;
 }
 
 header {
@@ -117,10 +101,10 @@ nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgb(51 51 51 / 25%);
+  background-color: rgb($bg, 25%);
 
   fieldset {
-    background-color: #202020;
+    background-color: $bg;
     min-width: 75%;
   }
 }
@@ -134,7 +118,7 @@ nav {
   span {
     width: 8px;
     height: 8px;
-    background-color: #888;
+    background-color: $grey;
     display: block;
     border-radius: 100%;
     margin-inline-start: 0.5rem;
@@ -142,7 +126,7 @@ nav {
 
   @for $i from 1 through 3 {
     &[data-view='#{$i}'] span:nth-child(#{$i}) {
-      background-color: #fff;
+      background-color: $white;
     }
   }
 }
