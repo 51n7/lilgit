@@ -14,7 +14,7 @@ export function convertGitResponse(
 
   const transformedResponse: TransformedStatus = {};
 
-  let idCounter = 0;
+  let idCounter = -1;
 
   response.files.forEach((file) => {
     if (
