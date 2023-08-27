@@ -24,20 +24,57 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
     () => [
       {
         key: 'c',
-        description: 'checkout branch',
+        description: 'checkout',
         function: () => {
-          console.log('c key was hit in branch view');
+          if (selectedIndex !== null) {
+            const selectedBranch = findBranchById(
+              transformBranches,
+              selectedIndex,
+            );
+
+            if (onBranchSelect) {
+              onBranchSelect(selectedBranch);
+            }
+          }
         },
       },
       {
         key: 'b',
-        description: 'new branch',
+        description: 'create from selected branch',
         function: () => {
           console.log('b key was hit in branch view');
         },
       },
       {
-        key: 'escape',
+        key: 'd',
+        description: 'delete',
+        function: () => {
+          console.log('delete');
+        },
+      },
+      {
+        key: 'p',
+        description: 'push selected to remote',
+        function: () => {
+          console.log('push');
+        },
+      },
+      {
+        key: 'f',
+        description: 'fetch remote branches',
+        function: () => {
+          console.log('fetch');
+        },
+      },
+      {
+        key: 'm',
+        description: 'merge selected into active branch',
+        function: () => {
+          console.log('merge');
+        },
+      },
+      {
+        key: 'Escape',
         function: () => {
           setShowMenu(false);
 
@@ -48,14 +85,19 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
         },
       },
     ],
-    [removeCurrentRepo, showMenu],
+    [
+      onBranchSelect,
+      removeCurrentRepo,
+      selectedIndex,
+      showMenu,
+      transformBranches,
+    ],
   );
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       const branchLength = branchesLength !== null ? branchesLength : 0;
-      const pressedKey = event.key.toLowerCase();
-      const mappedFunction = keyMap.find((item) => item.key === pressedKey);
+      const mappedFunction = keyMap.find((item) => item.key === event.key);
       if (mappedFunction) {
         mappedFunction.function();
       }

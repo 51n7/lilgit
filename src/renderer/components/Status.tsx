@@ -26,21 +26,77 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
   const keyMap = useMemo(
     () => [
       {
-        key: 's',
-        description: 'stash changes',
+        key: 'o',
+        description: 'open file',
         function: () => {
-          console.log('s key was hit in status view');
+          console.log('open');
+        },
+      },
+      {
+        key: 's',
+        description: 'stage file',
+        function: () => {
+          console.log('stage file');
+        },
+      },
+      {
+        key: 'u',
+        description: 'unstage file',
+        function: () => {
+          console.log('unstage file');
+        },
+      },
+      {
+        key: 'd',
+        description: 'discard changes to file',
+        function: () => {
+          console.log('discard changes to file');
         },
       },
       {
         key: 'a',
-        description: 'add file',
+        description: 'stage all unstaged files',
         function: () => {
-          console.log('a key was hit in status view');
+          console.log('stage all unstaged files');
         },
       },
       {
-        key: 'escape',
+        key: 'A',
+        description: 'stage all unstaged and untracked files',
+        function: () => {
+          console.log('stage all unstaged and untracked files');
+        },
+      },
+      {
+        key: 'U',
+        description: 'unstage all staged files',
+        function: () => {
+          console.log('unstage all staged files');
+        },
+      },
+      {
+        key: 'D',
+        description: 'discard all unstaged changes',
+        function: () => {
+          console.log('discard all unstaged changes');
+        },
+      },
+      {
+        key: 'c',
+        description: 'commit',
+        function: () => {
+          console.log('commit');
+        },
+      },
+      {
+        key: 'C',
+        description: 'commit, including unstaged',
+        function: () => {
+          console.log('commit, including unstaged');
+        },
+      },
+      {
+        key: 'Escape',
         function: () => {
           setShowMenu(false);
 
@@ -52,7 +108,7 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
         },
       },
       {
-        key: 'enter',
+        key: 'Enter',
         function: () => {
           if (selectedIndex !== null && !showMenu) {
             console.log(findFileById(transformStatus, selectedIndex));
@@ -66,8 +122,7 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       const listLength = totalModified;
-      const pressedKey = event.key.toLowerCase();
-      const mappedFunction = keyMap.find((item) => item.key === pressedKey);
+      const mappedFunction = keyMap.find((item) => item.key === event.key);
 
       if (mappedFunction) {
         mappedFunction.function();
@@ -121,6 +176,11 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
             <br />
           </div>
         ))}
+
+      {Object.keys(transformStatus).length === 0 && (
+        <div>Your working directory is clean.</div>
+      )}
+
       <Menu options={keyMap} isOpen={showMenu} />
     </div>
   );
