@@ -10,13 +10,14 @@ import Menu from './Menu';
 
 export type StatusProps = {
   status: StatusResult | undefined;
+  removeCurrentRepo: () => void;
 };
 
-function Status({ status }: StatusProps) {
+function Status({ status, removeCurrentRepo }: StatusProps) {
   const transformStatus = convertGitResponse(status);
+  const totalModified = Object.values(transformStatus).flat().length;
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
-  const totalModified = Object.values(transformStatus).flat().length;
 
   const handleItemClick = (item: GitItem) => {
     setSelectedIndex(item.id ?? 0);
@@ -26,14 +27,14 @@ function Status({ status }: StatusProps) {
     () => [
       {
         key: 's',
-        description: 'testing the s key',
+        description: 'stash changes',
         function: () => {
           console.log('s key was hit in status view');
         },
       },
       {
         key: 'a',
-        description: 'testing the a key',
+        description: 'add file',
         function: () => {
           console.log('a key was hit in status view');
         },
@@ -45,20 +46,21 @@ function Status({ status }: StatusProps) {
 
           if (!showMenu) {
             setSelectedIndex(null);
+            removeCurrentRepo();
+            console.log('remove repo');
           }
         },
       },
       {
         key: 'enter',
         function: () => {
-          // if (selectedIndex !== null && !showMenu) {
-          //   console.log(findFileById(transformStatus, selectedIndex));
-          // }
+          if (selectedIndex !== null && !showMenu) {
+            console.log(findFileById(transformStatus, selectedIndex));
+          }
         },
       },
     ],
-    [showMenu],
-    // [selectedIndex, showMenu, transformStatus],
+    [showMenu, removeCurrentRepo, selectedIndex, transformStatus],
   );
 
   useEffect(() => {

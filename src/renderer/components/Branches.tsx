@@ -5,9 +5,11 @@ import {
   findBranchById,
   transformBranch,
 } from '../../../src/helpers/branches.helpers';
+import Menu from './Menu';
 
-function Branches({ branches, onBranchSelect }: RepoProps) {
+function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [showMenu, setShowMenu] = useState<boolean>(false);
   const transformBranches = branches ? transformBranch(branches) : null;
   const branchesLength = branches
     ? Object.keys(branches.branches).length
@@ -21,19 +23,32 @@ function Branches({ branches, onBranchSelect }: RepoProps) {
   const keyMap = useMemo(
     () => [
       {
-        key: 's',
+        key: 'c',
+        description: 'checkout branch',
         function: () => {
-          console.log('s key was hit in branch view');
+          console.log('c key was hit in branch view');
         },
       },
       {
-        key: 'a',
+        key: 'b',
+        description: 'new branch',
         function: () => {
-          console.log('a key was hit in branch view');
+          console.log('b key was hit in branch view');
+        },
+      },
+      {
+        key: 'escape',
+        function: () => {
+          setShowMenu(false);
+
+          if (!showMenu) {
+            setSelectedIndex(null);
+            removeCurrentRepo();
+          }
         },
       },
     ],
-    [],
+    [removeCurrentRepo, showMenu],
   );
 
   useEffect(() => {
@@ -47,34 +62,40 @@ function Branches({ branches, onBranchSelect }: RepoProps) {
 
       if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
         event.preventDefault();
-        setSelectedIndex((prevIndex) => {
-          if (prevIndex === null || prevIndex === 0) {
-            return branchLength - 1;
-          } else {
-            return prevIndex - 1;
-          }
-        });
+        if (!showMenu) {
+          setSelectedIndex((prevIndex) => {
+            if (prevIndex === null || prevIndex === 0) {
+              return branchLength - 1;
+            } else {
+              return prevIndex - 1;
+            }
+          });
+        }
       } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
         event.preventDefault();
-        setSelectedIndex((prevIndex) => {
-          if (prevIndex === null || prevIndex === branchLength - 1) {
-            return 0;
-          } else {
-            return prevIndex + 1;
-          }
-        });
+        if (!showMenu) {
+          setSelectedIndex((prevIndex) => {
+            if (prevIndex === null || prevIndex === branchLength - 1) {
+              return 0;
+            } else {
+              return prevIndex + 1;
+            }
+          });
+        }
       } else if (event.key === 'Enter') {
         event.preventDefault();
-        if (selectedIndex !== null) {
-          const selectedBranch = findBranchById(
-            transformBranches,
-            selectedIndex,
-          );
+        // if (selectedIndex !== null) {
+        //   const selectedBranch = findBranchById(
+        //     transformBranches,
+        //     selectedIndex,
+        //   );
 
-          if (onBranchSelect) {
-            onBranchSelect(selectedBranch);
-          }
-        }
+        //   if (onBranchSelect) {
+        //     onBranchSelect(selectedBranch);
+        //   }
+        // }
+      } else if (event.shiftKey && event.code == 'Slash') {
+        setShowMenu((showMenu) => !showMenu);
       }
     };
     window.addEventListener('keydown', handleKeyPress);
@@ -87,6 +108,7 @@ function Branches({ branches, onBranchSelect }: RepoProps) {
     transformBranches,
     branchesLength,
     onBranchSelect,
+    showMenu,
   ]);
 
   return (
@@ -115,6 +137,7 @@ function Branches({ branches, onBranchSelect }: RepoProps) {
             <br />
           </div>
         ))}
+      <Menu options={keyMap} isOpen={showMenu} />
     </div>
   );
 }

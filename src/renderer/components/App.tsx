@@ -13,8 +13,12 @@ const App = () => {
   const [branchList, setBranchList] = useState<BranchSummary>();
   const [viewState, setViewState] = useState<number>(0);
   const views = [
-    <Status status={status} />,
-    <Branches branches={branchList} onBranchSelect={updateBranches} />,
+    <Status status={status} removeCurrentRepo={removeCurrentRepo} />,
+    <Branches
+      branches={branchList}
+      onBranchSelect={updateBranches}
+      removeCurrentRepo={removeCurrentRepo}
+    />,
     <Graph />,
   ];
 
@@ -79,7 +83,7 @@ const App = () => {
         setViewState(viewState === 0 ? views.length - 1 : viewState - 1);
       }
       if (e.code == 'Escape') {
-        removeCurrentRepo();
+        // removeCurrentRepo();
       }
     };
     window.addEventListener('keyup', handleKeyUp);

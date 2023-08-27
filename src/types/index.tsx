@@ -9,6 +9,7 @@ export type RepoProps = {
   currentRepo?: string;
   branches?: BranchSummary;
   onBranchSelect?: (item: TransformBranch | undefined) => void;
+  removeCurrentRepo: () => void;
 };
 
 export type TransformBranch = {
