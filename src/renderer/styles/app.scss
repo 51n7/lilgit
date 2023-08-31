@@ -108,6 +108,17 @@ nav {
     background-color: $bg;
     min-width: 75%;
   }
+
+  legend {
+    padding-inline: 0.5rem;
+  }
+
+  input {
+    width: 100%;
+    background-color: transparent;
+    color: #dfe5ff;
+    outline: none;
+  }
 }
 
 .dot-nav {

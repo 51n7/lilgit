@@ -1,21 +1,26 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type DialogProps = {
+  title: string;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onSubmit: (item: string) => void;
 };
 
-function Dialog({ isOpen, setIsOpen }: DialogProps) {
+function Dialog({ title, isOpen, setIsOpen, onSubmit }: DialogProps) {
+  const [dialogString, setDialogString] = useState<string>('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        console.log('pressed escape in dialog');
         setIsOpen(false);
       }
       if (event.key === 'Enter') {
-        console.log('pressed enter in dialog');
         setIsOpen(false);
+        onSubmit(dialogString);
       }
+      inputRef.current?.focus();
     };
 
     if (isOpen) {
@@ -25,14 +30,21 @@ function Dialog({ isOpen, setIsOpen }: DialogProps) {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [isOpen, setIsOpen]);
+  }, [isOpen, onSubmit, setIsOpen, dialogString]);
 
   return (
     isOpen && (
       <nav>
         <fieldset className='menu'>
-          <legend>New branch name (branch is off of 'main')</legend>
-          <div>new-branch</div>
+          <legend>{title}</legend>
+          <input
+            type='text'
+            ref={inputRef}
+            defaultValue=''
+            onChange={(e) => {
+              setDialogString(e.currentTarget.value);
+            }}
+          />
         </fieldset>
       </nav>
     )

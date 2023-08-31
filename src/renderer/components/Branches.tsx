@@ -22,6 +22,10 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
     setSelectedIndex(item.id);
   };
 
+  const handleDialogSelect = (item: string) => {
+    console.log('Dialog says: ', item);
+  };
+
   const keyMap = useMemo(
     () => [
       {
@@ -44,8 +48,9 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
         key: 'b',
         description: 'create from selected branch',
         function: () => {
-          // console.log('b key was hit in branch view');
-          setShowDialog((showDialog) => !showDialog);
+          if (selectedIndex !== null) {
+            setShowDialog((showDialog) => !showDialog);
+          }
         },
       },
       {
@@ -100,6 +105,7 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
     const handleKeyPress = (event: KeyboardEvent) => {
       const branchLength = branchesLength !== null ? branchesLength : 0;
       const mappedFunction = keyMap.find((item) => item.key === event.key);
+
       if (mappedFunction) {
         mappedFunction.function();
       }
@@ -160,7 +166,12 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
           </div>
         ))}
       <Menu options={keyMap} isOpen={showMenu} setIsOpen={setShowMenu} />
-      <Dialog isOpen={showDialog} setIsOpen={setShowDialog} />
+      <Dialog
+        title='New branch'
+        isOpen={showDialog}
+        setIsOpen={setShowDialog}
+        onSubmit={handleDialogSelect}
+      />
     </div>
   );
 }

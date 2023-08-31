@@ -8,7 +8,7 @@ type KeyMapItem = {
 
 type MenuProps = {
   options: KeyMapItem[];
-  onItemClick?: (item: string) => void;
+  // onItemClick?: (item: string) => void;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
