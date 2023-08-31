@@ -6,10 +6,12 @@ import {
   transformBranch,
 } from '../../../src/helpers/branches.helpers';
 import Menu from './Menu';
+import Dialog from './Dialog';
 
 function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [showDialog, setShowDialog] = useState<boolean>(false);
   const transformBranches = branches ? transformBranch(branches) : null;
   const branchesLength = branches
     ? Object.keys(branches.branches).length
@@ -42,7 +44,8 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
         key: 'b',
         description: 'create from selected branch',
         function: () => {
-          console.log('b key was hit in branch view');
+          // console.log('b key was hit in branch view');
+          setShowDialog((showDialog) => !showDialog);
         },
       },
       {
@@ -76,9 +79,7 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
       {
         key: 'Escape',
         function: () => {
-          setShowMenu(false);
-
-          if (!showMenu) {
+          if (!showMenu && !showDialog) {
             setSelectedIndex(null);
             removeCurrentRepo();
           }
@@ -89,6 +90,7 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
       onBranchSelect,
       removeCurrentRepo,
       selectedIndex,
+      showDialog,
       showMenu,
       transformBranches,
     ],
@@ -104,46 +106,33 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
 
       if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
         event.preventDefault();
-        if (!showMenu) {
-          setSelectedIndex((prevIndex) => {
-            if (prevIndex === null || prevIndex === 0) {
-              return branchLength - 1;
-            } else {
-              return prevIndex - 1;
-            }
-          });
-        }
+        setSelectedIndex((prevIndex) => {
+          if (prevIndex === null || prevIndex === 0) {
+            return branchLength - 1;
+          } else {
+            return prevIndex - 1;
+          }
+        });
       } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
         event.preventDefault();
-        if (!showMenu) {
-          setSelectedIndex((prevIndex) => {
-            if (prevIndex === null || prevIndex === branchLength - 1) {
-              return 0;
-            } else {
-              return prevIndex + 1;
-            }
-          });
-        }
-      } else if (event.key === 'Enter') {
-        event.preventDefault();
-        // if (selectedIndex !== null) {
-        //   const selectedBranch = findBranchById(
-        //     transformBranches,
-        //     selectedIndex,
-        //   );
-
-        //   if (onBranchSelect) {
-        //     onBranchSelect(selectedBranch);
-        //   }
-        // }
+        setSelectedIndex((prevIndex) => {
+          if (prevIndex === null || prevIndex === branchLength - 1) {
+            return 0;
+          } else {
+            return prevIndex + 1;
+          }
+        });
       } else if (event.shiftKey && event.code == 'Slash') {
         setShowMenu((showMenu) => !showMenu);
       }
     };
-    window.addEventListener('keydown', handleKeyPress);
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress);
-    };
+
+    if (!showMenu && !showDialog) {
+      window.addEventListener('keydown', handleKeyPress);
+      return () => {
+        window.removeEventListener('keydown', handleKeyPress);
+      };
+    }
   }, [
     keyMap,
     selectedIndex,
@@ -151,20 +140,11 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
     branchesLength,
     onBranchSelect,
     showMenu,
+    showDialog,
   ]);
 
   return (
     <div className='view-branches'>
-      {/* <header>
-        <p>
-          <em>Repo:</em> {currentRepo}
-        </p>
-        <p>
-          <em>Branch:</em> On branch{' '}
-          <span className='text-blue'>`{branches?.current}`</span>
-        </p>
-      </header> */}
-
       {transformBranches &&
         Object.keys(transformBranches).map((section) => (
           <div key={section}>
@@ -179,7 +159,8 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
             <br />
           </div>
         ))}
-      <Menu options={keyMap} isOpen={showMenu} />
+      <Menu options={keyMap} isOpen={showMenu} setIsOpen={setShowMenu} />
+      <Dialog isOpen={showDialog} setIsOpen={setShowDialog} />
     </div>
   );
 }

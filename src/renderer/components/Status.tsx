@@ -54,6 +54,13 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
         },
       },
       {
+        key: 'D',
+        description: 'discard all unstaged changes',
+        function: () => {
+          console.log('discard all unstaged changes');
+        },
+      },
+      {
         key: 'a',
         description: 'stage all unstaged files',
         function: () => {
@@ -75,13 +82,6 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
         },
       },
       {
-        key: 'D',
-        description: 'discard all unstaged changes',
-        function: () => {
-          console.log('discard all unstaged changes');
-        },
-      },
-      {
         key: 'c',
         description: 'commit',
         function: () => {
@@ -98,12 +98,9 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
       {
         key: 'Escape',
         function: () => {
-          setShowMenu(false);
-
           if (!showMenu) {
             setSelectedIndex(null);
             removeCurrentRepo();
-            console.log('remove repo');
           }
         },
       },
@@ -130,36 +127,33 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
 
       if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
         event.preventDefault();
-        if (!showMenu) {
-          setSelectedIndex((prevIndex) => {
-            if (prevIndex === null || prevIndex === 0) {
-              return listLength - 1;
-            } else {
-              return prevIndex - 1;
-            }
-          });
-        }
+        setSelectedIndex((prevIndex) => {
+          if (prevIndex === null || prevIndex === 0) {
+            return listLength - 1;
+          } else {
+            return prevIndex - 1;
+          }
+        });
       } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
         event.preventDefault();
-        if (!showMenu) {
-          setSelectedIndex((prevIndex) => {
-            if (prevIndex === null || prevIndex === listLength - 1) {
-              return 0;
-            } else {
-              return prevIndex + 1;
-            }
-          });
-        }
+        setSelectedIndex((prevIndex) => {
+          if (prevIndex === null || prevIndex === listLength - 1) {
+            return 0;
+          } else {
+            return prevIndex + 1;
+          }
+        });
       } else if (event.shiftKey && event.code == 'Slash') {
         setShowMenu((showMenu) => !showMenu);
       }
     };
 
-    window.addEventListener('keydown', handleKeyPress);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress);
-    };
+    if (!showMenu) {
+      window.addEventListener('keydown', handleKeyPress);
+      return () => {
+        window.removeEventListener('keydown', handleKeyPress);
+      };
+    }
   }, [keyMap, totalModified, transformStatus, selectedIndex, showMenu]);
 
   return (
@@ -181,7 +175,7 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
         <div>Your working directory is clean.</div>
       )}
 
-      <Menu options={keyMap} isOpen={showMenu} />
+      <Menu options={keyMap} isOpen={showMenu} setIsOpen={setShowMenu} />
     </div>
   );
 }

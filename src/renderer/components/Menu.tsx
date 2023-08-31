@@ -10,9 +10,10 @@ type MenuProps = {
   options: KeyMapItem[];
   onItemClick?: (item: string) => void;
   isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-function Menu({ options, isOpen }: MenuProps) {
+function Menu({ options, isOpen, setIsOpen }: MenuProps) {
   const [menuIndex, setMenuIndex] = useState<number>(0);
   const objectsWithDescription = options.filter((item) => item.description);
 
@@ -36,16 +37,20 @@ function Menu({ options, isOpen }: MenuProps) {
         });
       } else if (event.key === 'Enter') {
         objectsWithDescription[menuIndex].function();
+        setIsOpen(false);
+      } else if (event.key === 'Escape') {
+        setIsOpen(false);
       }
     };
 
     if (isOpen) {
       window.addEventListener('keydown', handleKeyPress);
     }
+
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [objectsWithDescription, menuIndex, isOpen]);
+  }, [objectsWithDescription, menuIndex, isOpen, setIsOpen]);
 
   return (
     isOpen && (
