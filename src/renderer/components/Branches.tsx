@@ -22,7 +22,7 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
     setSelectedIndex(item.id);
   };
 
-  const handleDialogSelect = (item: string) => {
+  const handleNewBranchDialog = (item: string) => {
     console.log('new branch: ', item);
   };
 
@@ -170,7 +170,7 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
         title='New branch'
         isOpen={newBranchDialog}
         setIsOpen={setNewBranchDialog}
-        onSubmit={handleDialogSelect}
+        onSubmit={handleNewBranchDialog}
       />
     </div>
   );

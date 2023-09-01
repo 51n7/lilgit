@@ -140,6 +140,8 @@ async function checkoutBranch(path: string, branch: string) {
       trimmed: false,
     };
     const git = simpleGit(options);
+    // await git.checkoutLocalBranch('foo', ['-B']);
+    // await git.checkoutLocalBranch('new-branch');
     await git.checkout(branch);
     return await git.branch();
   }
@@ -154,8 +156,6 @@ async function getStatus(path: string) {
       trimmed: false,
     };
     const git = simpleGit(options);
-    // console.log(await git.status());
-    // console.log(convertGitResponse(await git.status()));
     return await git.status();
   }
 }
