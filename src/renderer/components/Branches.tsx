@@ -11,7 +11,7 @@ import Dialog from './Dialog';
 function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
-  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [newBranchDialog, setNewBranchDialog] = useState<boolean>(false);
   const transformBranches = branches ? transformBranch(branches) : null;
   const branchesLength = branches
     ? Object.keys(branches.branches).length
@@ -23,7 +23,7 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
   };
 
   const handleDialogSelect = (item: string) => {
-    console.log('Dialog says: ', item);
+    console.log('new branch: ', item);
   };
 
   const keyMap = useMemo(
@@ -49,7 +49,7 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
         description: 'create from selected branch',
         function: () => {
           if (selectedIndex !== null) {
-            setShowDialog((showDialog) => !showDialog);
+            setNewBranchDialog((showDialog) => !showDialog);
           }
         },
       },
@@ -84,7 +84,7 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
       {
         key: 'Escape',
         function: () => {
-          if (!showMenu && !showDialog) {
+          if (!showMenu && !newBranchDialog) {
             setSelectedIndex(null);
             removeCurrentRepo();
           }
@@ -95,7 +95,7 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
       onBranchSelect,
       removeCurrentRepo,
       selectedIndex,
-      showDialog,
+      newBranchDialog,
       showMenu,
       transformBranches,
     ],
@@ -133,7 +133,7 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
       }
     };
 
-    if (!showMenu && !showDialog) {
+    if (!showMenu && !newBranchDialog) {
       window.addEventListener('keydown', handleKeyPress);
       return () => {
         window.removeEventListener('keydown', handleKeyPress);
@@ -146,7 +146,7 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
     branchesLength,
     onBranchSelect,
     showMenu,
-    showDialog,
+    newBranchDialog,
   ]);
 
   return (
@@ -168,8 +168,8 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
       <Menu options={keyMap} isOpen={showMenu} setIsOpen={setShowMenu} />
       <Dialog
         title='New branch'
-        isOpen={showDialog}
-        setIsOpen={setShowDialog}
+        isOpen={newBranchDialog}
+        setIsOpen={setNewBranchDialog}
         onSubmit={handleDialogSelect}
       />
     </div>

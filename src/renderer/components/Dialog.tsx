@@ -20,8 +20,11 @@ function Dialog({ title, isOpen, setIsOpen, onSubmit }: DialogProps) {
         setIsOpen(false);
         onSubmit(dialogString);
       }
-      inputRef.current?.focus();
     };
+
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 1);
 
     if (isOpen) {
       window.addEventListener('keydown', handleKeyPress);

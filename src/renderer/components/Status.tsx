@@ -7,6 +7,7 @@ import {
 import StatusList from './StatusList';
 import { GitItem } from 'src/types';
 import Menu from './Menu';
+import Dialog from './Dialog';
 
 export type StatusProps = {
   status: StatusResult | undefined;
@@ -18,9 +19,14 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
   const totalModified = Object.values(transformStatus).flat().length;
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [showCommitDialog, setShowCommitDialog] = useState<boolean>(false);
 
   const handleItemClick = (item: GitItem) => {
     setSelectedIndex(item.id ?? 0);
+  };
+
+  const handleCommitDialog = (item: string) => {
+    console.log('commit: ', item);
   };
 
   const keyMap = useMemo(
@@ -86,6 +92,10 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
         description: 'commit',
         function: () => {
           console.log('commit');
+
+          if (selectedIndex !== null) {
+            setShowCommitDialog((showCommit) => !showCommit);
+          }
         },
       },
       {
@@ -148,13 +158,20 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
       }
     };
 
-    if (!showMenu) {
+    if (!showMenu && !showCommitDialog) {
       window.addEventListener('keydown', handleKeyPress);
       return () => {
         window.removeEventListener('keydown', handleKeyPress);
       };
     }
-  }, [keyMap, totalModified, transformStatus, selectedIndex, showMenu]);
+  }, [
+    keyMap,
+    totalModified,
+    transformStatus,
+    selectedIndex,
+    showMenu,
+    showCommitDialog,
+  ]);
 
   return (
     <div className='view-status'>
@@ -176,6 +193,12 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
       )}
 
       <Menu options={keyMap} isOpen={showMenu} setIsOpen={setShowMenu} />
+      <Dialog
+        title='Commit Message'
+        isOpen={showCommitDialog}
+        setIsOpen={setShowCommitDialog}
+        onSubmit={handleCommitDialog}
+      />
     </div>
   );
 }
