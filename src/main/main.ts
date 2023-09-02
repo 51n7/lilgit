@@ -118,44 +118,49 @@ function convertToTildePath(inputPath: string) {
   return inputPath;
 }
 
+function gitOptions(path: string) {
+  return {
+    baseDir: path,
+    binary: 'git',
+    maxConcurrentProcesses: 6,
+    trimmed: false,
+  };
+}
+
 async function getBranches(path: string) {
   if (path) {
-    const options = {
-      baseDir: path,
-      binary: 'git',
-      maxConcurrentProcesses: 6,
-      trimmed: false,
-    };
-    const git = simpleGit(options);
+    const git = simpleGit(gitOptions(path));
     return await git.branch();
   }
 }
 
 async function checkoutBranch(path: string, branch: string) {
   if (path) {
-    const options = {
-      baseDir: path,
-      binary: 'git',
-      maxConcurrentProcesses: 6,
-      trimmed: false,
-    };
-    const git = simpleGit(options);
-    // await git.checkoutLocalBranch('foo', ['-B']);
-    // await git.checkoutLocalBranch('new-branch');
+    const git = simpleGit(gitOptions(path));
     await git.checkout(branch);
+    return await git.branch();
+  }
+}
+
+async function addBranch(path: string, name: string) {
+  if (path) {
+    const git = simpleGit(gitOptions(path));
+    await git.checkoutLocalBranch(name);
+    return await git.branch();
+  }
+}
+
+async function delteBranch(path: string, name: string) {
+  if (path) {
+    const git = simpleGit(gitOptions(path));
+    await git.deleteLocalBranch(name);
     return await git.branch();
   }
 }
 
 async function getStatus(path: string) {
   if (path) {
-    const options = {
-      baseDir: path,
-      binary: 'git',
-      maxConcurrentProcesses: 6,
-      trimmed: false,
-    };
-    const git = simpleGit(options);
+    const git = simpleGit(gitOptions(path));
     return await git.status();
   }
 }
@@ -230,6 +235,18 @@ app.whenReady().then(() => {
   ipcMain.on('checkout-branch', (event, path, branch) => {
     checkoutBranch(path, branch).then((path) => {
       event.sender.send('checkout-branch-success', path);
+    });
+  });
+
+  ipcMain.on('add-branch', (event, path, name) => {
+    addBranch(path, name).then((path) => {
+      event.sender.send('add-branch-success', path);
+    });
+  });
+
+  ipcMain.on('delete-branch', (event, path, name) => {
+    delteBranch(path, name).then((path) => {
+      event.sender.send('delete-branch-success', path);
     });
   });
 

@@ -23,6 +23,11 @@ export type ContextBridgeApi = {
     path: string | undefined,
     branch: string,
   ) => Promise<BranchSummary>;
+  addBranch: (path: string | undefined, name: string) => Promise<BranchSummary>;
+  deleteBranch: (
+    path: string | undefined,
+    name: string,
+  ) => Promise<BranchSummary>;
   getStatus: (path: string | undefined) => Promise<StatusResult>;
 };
 
@@ -111,6 +116,26 @@ const exposedApi: ContextBridgeApi = {
       ipcRenderer.once(
         'checkout-branch-success',
         (_event, data: BranchSummary) => resolve(data),
+      );
+    });
+  },
+
+  addBranch: (path, name) => {
+    ipcRenderer.send('add-branch', path, name);
+
+    return new Promise((resolve) => {
+      ipcRenderer.once('add-branch-success', (_event, data: BranchSummary) =>
+        resolve(data),
+      );
+    });
+  },
+
+  deleteBranch: (path, name) => {
+    ipcRenderer.send('delete-branch', path, name);
+
+    return new Promise((resolve) => {
+      ipcRenderer.once('delete-branch-success', (_event, data: BranchSummary) =>
+        resolve(data),
       );
     });
   },

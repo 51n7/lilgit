@@ -118,7 +118,7 @@ function RepoList({ onRepoSave, onRepoDelete, addRepo, list }: RepoListProps) {
             ))}
         </ul>
       </div>
-      <Menu options={keyMap} isOpen={showMenu} />
+      <Menu options={keyMap} isOpen={showMenu} setIsOpen={setShowMenu} />
     </div>
   );
 }

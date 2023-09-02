@@ -16,7 +16,9 @@ const App = () => {
     <Status status={status} removeCurrentRepo={removeCurrentRepo} />,
     <Branches
       branches={branchList}
-      onBranchSelect={updateBranches}
+      onBranchCheckout={updateBranches}
+      onBranchNew={addBranch}
+      onBranchDelete={deleteBranch}
       removeCurrentRepo={removeCurrentRepo}
     />,
     <Graph />,
@@ -47,6 +49,15 @@ const App = () => {
     setBranchList(
       await window.api.checkoutBranch(currentRepo?.absolute, item?.name ?? ''),
     );
+  }
+
+  async function addBranch(name: string) {
+    setBranchList(await window.api.addBranch(currentRepo?.absolute, name));
+  }
+
+  async function deleteBranch(name: string) {
+    setBranchList(await window.api.deleteBranch(currentRepo?.absolute, name));
+    // console.log(name);
   }
 
   async function folderSelect() {

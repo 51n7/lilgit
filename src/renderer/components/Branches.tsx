@@ -8,7 +8,13 @@ import {
 import Menu from './Menu';
 import Dialog from './Dialog';
 
-function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
+function Branches({
+  branches,
+  onBranchCheckout,
+  onBranchNew,
+  onBranchDelete,
+  removeCurrentRepo,
+}: RepoProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [newBranchDialog, setNewBranchDialog] = useState<boolean>(false);
@@ -22,9 +28,9 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
     setSelectedIndex(item.id);
   };
 
-  const handleNewBranchDialog = (item: string) => {
-    console.log('new branch: ', item);
-  };
+  // const handleNewBranchDialog = (name: string) => {
+  //   onBranchNew(name);
+  // };
 
   const keyMap = useMemo(
     () => [
@@ -38,8 +44,8 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
               selectedIndex,
             );
 
-            if (onBranchSelect) {
-              onBranchSelect(selectedBranch);
+            if (onBranchCheckout) {
+              onBranchCheckout(selectedBranch);
             }
           }
         },
@@ -57,7 +63,16 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
         key: 'd',
         description: 'delete',
         function: () => {
-          console.log('delete');
+          if (selectedIndex !== null) {
+            const selectedBranch = findBranchById(
+              transformBranches,
+              selectedIndex,
+            );
+
+            if (onBranchCheckout) {
+              onBranchDelete(selectedBranch?.name ?? '');
+            }
+          }
         },
       },
       {
@@ -92,12 +107,13 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
       },
     ],
     [
-      onBranchSelect,
-      removeCurrentRepo,
       selectedIndex,
-      newBranchDialog,
-      showMenu,
       transformBranches,
+      onBranchCheckout,
+      onBranchDelete,
+      showMenu,
+      newBranchDialog,
+      removeCurrentRepo,
     ],
   );
 
@@ -144,7 +160,7 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
     selectedIndex,
     transformBranches,
     branchesLength,
-    onBranchSelect,
+    onBranchCheckout,
     showMenu,
     newBranchDialog,
   ]);
@@ -170,7 +186,9 @@ function Branches({ branches, onBranchSelect, removeCurrentRepo }: RepoProps) {
         title='New branch'
         isOpen={newBranchDialog}
         setIsOpen={setNewBranchDialog}
-        onSubmit={handleNewBranchDialog}
+        onSubmit={(name) => {
+          onBranchNew(name);
+        }}
       />
     </div>
   );
