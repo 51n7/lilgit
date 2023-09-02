@@ -123,9 +123,13 @@ const exposedApi: ContextBridgeApi = {
   addBranch: (path, name) => {
     ipcRenderer.send('add-branch', path, name);
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       ipcRenderer.once('add-branch-success', (_event, data: BranchSummary) =>
         resolve(data),
+      );
+
+      ipcRenderer.once('add-branch-error', (_event, error) =>
+        reject(new Error(error)),
       );
     });
   },

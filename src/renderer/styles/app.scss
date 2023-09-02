@@ -143,3 +143,23 @@ nav {
     }
   }
 }
+
+.error-notification {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  background-color: $red;
+  color: #ffffff;
+  padding: 0.5rem;
+  text-align: center;
+  z-index: 9999;
+  transition: transform 250ms ease-in-out, opacity 250ms ease-in-out;
+  transform: translateY(calc(-100% - 10px));
+  opacity: 0;
+
+  &.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

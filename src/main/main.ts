@@ -238,10 +238,12 @@ app.whenReady().then(() => {
     });
   });
 
-  ipcMain.on('add-branch', (event, path, name) => {
-    addBranch(path, name).then((path) => {
-      event.sender.send('add-branch-success', path);
-    });
+  ipcMain.on('add-branch', async (event, path, name) => {
+    try {
+      event.sender.send('add-branch-success', await addBranch(path, name));
+    } catch (err) {
+      event.sender.send('add-branch-error', (err as Error).message);
+    }
   });
 
   ipcMain.on('delete-branch', (event, path, name) => {

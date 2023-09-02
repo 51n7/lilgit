@@ -5,6 +5,7 @@ import Status from './Status';
 import Branches from './Branches';
 import Graph from './Graph';
 import RepoList from './RepoList';
+import ErrorNotification from './ErrorNotification';
 
 const App = () => {
   const [repoList, setRepoList] = useState<RepoPathProp[]>([]);
@@ -12,6 +13,8 @@ const App = () => {
   const [status, setStatus] = useState<StatusResult>();
   const [branchList, setBranchList] = useState<BranchSummary>();
   const [viewState, setViewState] = useState<number>(0);
+  const [error, setError] = useState<string | null>(null);
+
   const views = [
     <Status status={status} removeCurrentRepo={removeCurrentRepo} />,
     <Branches
@@ -52,7 +55,11 @@ const App = () => {
   }
 
   async function addBranch(name: string) {
-    setBranchList(await window.api.addBranch(currentRepo?.absolute, name));
+    try {
+      setBranchList(await window.api.addBranch(currentRepo?.absolute, name));
+    } catch (error) {
+      setError((error as Error).message);
+    }
   }
 
   async function deleteBranch(name: string) {
@@ -143,6 +150,9 @@ const App = () => {
           onRepoDelete={deleteRepo}
           addRepo={folderSelect}
         />
+      )}
+      {error && (
+        <ErrorNotification message={error} clearError={() => setError(null)} />
       )}
     </>
   );
