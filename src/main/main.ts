@@ -246,10 +246,13 @@ app.whenReady().then(() => {
     }
   });
 
-  ipcMain.on('delete-branch', (event, path, name) => {
-    delteBranch(path, name).then((path) => {
-      event.sender.send('delete-branch-success', path);
-    });
+  ipcMain.on('delete-branch', async (event, path, name) => {
+    try {
+      event.sender.send('delete-branch-success', await delteBranch(path, name));
+    } catch (err) {
+      event.sender.send('delete-branch-error', (err as Error).message);
+      console.log((err as Error).message);
+    }
   });
 
   ipcMain.on('get-status', (event, path) => {

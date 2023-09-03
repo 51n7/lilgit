@@ -127,7 +127,6 @@ const exposedApi: ContextBridgeApi = {
       ipcRenderer.once('add-branch-success', (_event, data: BranchSummary) =>
         resolve(data),
       );
-
       ipcRenderer.once('add-branch-error', (_event, error) =>
         reject(new Error(error)),
       );
@@ -137,9 +136,12 @@ const exposedApi: ContextBridgeApi = {
   deleteBranch: (path, name) => {
     ipcRenderer.send('delete-branch', path, name);
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       ipcRenderer.once('delete-branch-success', (_event, data: BranchSummary) =>
         resolve(data),
+      );
+      ipcRenderer.once('delete-branch-error', (_event, error) =>
+        reject(new Error(error)),
       );
     });
   },

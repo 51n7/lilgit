@@ -63,8 +63,11 @@ const App = () => {
   }
 
   async function deleteBranch(name: string) {
-    setBranchList(await window.api.deleteBranch(currentRepo?.absolute, name));
-    // console.log(name);
+    try {
+      setBranchList(await window.api.deleteBranch(currentRepo?.absolute, name));
+    } catch (error) {
+      setError((error as Error).message);
+    }
   }
 
   async function folderSelect() {
