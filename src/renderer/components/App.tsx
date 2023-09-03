@@ -19,6 +19,7 @@ const App = () => {
     <Status
       status={status}
       onFileStage={onFileStage}
+      onFileUnstage={onFileUnstage}
       removeCurrentRepo={removeCurrentRepo}
     />,
     <Branches
@@ -53,7 +54,19 @@ const App = () => {
   }
 
   async function onFileStage(name: string) {
-    setStatus(await window.api.stageFile(currentRepo?.absolute, name));
+    try {
+      setStatus(await window.api.stageFile(currentRepo?.absolute, name));
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  }
+
+  async function onFileUnstage(name: string) {
+    try {
+      setStatus(await window.api.unstageFile(currentRepo?.absolute, name));
+    } catch (error) {
+      setError((error as Error).message);
+    }
   }
 
   async function updateBranches(item: TransformBranch | undefined) {

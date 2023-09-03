@@ -158,13 +158,13 @@ async function delteBranch(path: string, name: string) {
   }
 }
 
-async function stageFile(path: string, name: string) {
-  if (path) {
-    const git = simpleGit(gitOptions(path));
-    await git.add(name);
-    return await git.status();
-  }
-}
+// async function stageFile(path: string, name: string) {
+//   if (path) {
+//     const git = simpleGit(gitOptions(path));
+//     await git.add(name);
+//     return await git.status();
+//   }
+// }
 
 async function getStatus(path: string) {
   if (path) {
@@ -263,15 +263,29 @@ app.whenReady().then(() => {
   });
 
   ipcMain.on('stage-file', async (event, path, name) => {
-    stageFile(path, name).then((path) => {
-      try {
-        const cleanResponse = { ...path };
-        delete cleanResponse.isClean;
-        event.sender.send('stage-file-success', cleanResponse);
-      } catch (err) {
-        event.sender.send('stage-file-error', (err as Error).message);
-      }
-    });
+    const git = simpleGit(gitOptions(path));
+    try {
+      await git.add(name);
+      event.sender.send(
+        'stage-file-success',
+        JSON.parse(JSON.stringify(await git.status())),
+      );
+    } catch (err) {
+      event.sender.send('stage-file-error', (err as Error).message);
+    }
+  });
+
+  ipcMain.on('unstage-file', async (event, path, name) => {
+    const git = simpleGit(gitOptions(path));
+    try {
+      await git.reset(['--mixed', name]);
+      event.sender.send(
+        'unstage-file-success',
+        JSON.parse(JSON.stringify(await git.status())),
+      );
+    } catch (err) {
+      event.sender.send('unstage-file-error', (err as Error).message);
+    }
   });
 
   ipcMain.on('get-status', (event, path) => {

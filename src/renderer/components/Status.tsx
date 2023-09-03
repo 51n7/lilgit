@@ -12,10 +12,16 @@ import Dialog from './Dialog';
 export type StatusProps = {
   status: StatusResult | undefined;
   onFileStage: (name: string) => void;
+  onFileUnstage: (name: string) => void;
   removeCurrentRepo: () => void;
 };
 
-function Status({ status, onFileStage, removeCurrentRepo }: StatusProps) {
+function Status({
+  status,
+  onFileStage,
+  onFileUnstage,
+  removeCurrentRepo,
+}: StatusProps) {
   const transformStatus = convertGitResponse(status);
   const totalModified = Object.values(transformStatus).flat().length;
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -54,7 +60,11 @@ function Status({ status, onFileStage, removeCurrentRepo }: StatusProps) {
         key: 'u',
         description: 'unstage file',
         function: () => {
-          console.log('unstage file');
+          if (selectedIndex !== null) {
+            onFileUnstage(
+              findFileById(transformStatus, selectedIndex)?.path ?? '',
+            );
+          }
         },
       },
       {
@@ -128,7 +138,14 @@ function Status({ status, onFileStage, removeCurrentRepo }: StatusProps) {
         },
       },
     ],
-    [selectedIndex, transformStatus, onFileStage, showMenu, removeCurrentRepo],
+    [
+      selectedIndex,
+      onFileStage,
+      transformStatus,
+      onFileUnstage,
+      showMenu,
+      removeCurrentRepo,
+    ],
   );
 
   useEffect(() => {
