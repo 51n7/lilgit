@@ -16,7 +16,11 @@ const App = () => {
   const [error, setError] = useState<string | null>(null);
 
   const views = [
-    <Status status={status} removeCurrentRepo={removeCurrentRepo} />,
+    <Status
+      status={status}
+      onFileStage={onFileStage}
+      removeCurrentRepo={removeCurrentRepo}
+    />,
     <Branches
       branches={branchList}
       onBranchCheckout={updateBranches}
@@ -46,6 +50,10 @@ const App = () => {
   function removeCurrentRepo() {
     setCurrentRepo(undefined);
     window.api.removeCurrent();
+  }
+
+  async function onFileStage(name: string) {
+    setStatus(await window.api.stageFile(currentRepo?.absolute, name));
   }
 
   async function updateBranches(item: TransformBranch | undefined) {

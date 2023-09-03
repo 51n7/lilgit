@@ -158,6 +158,14 @@ async function delteBranch(path: string, name: string) {
   }
 }
 
+async function stageFile(path: string, name: string) {
+  if (path) {
+    const git = simpleGit(gitOptions(path));
+    await git.add(name);
+    return await git.status();
+  }
+}
+
 async function getStatus(path: string) {
   if (path) {
     const git = simpleGit(gitOptions(path));
@@ -251,8 +259,19 @@ app.whenReady().then(() => {
       event.sender.send('delete-branch-success', await delteBranch(path, name));
     } catch (err) {
       event.sender.send('delete-branch-error', (err as Error).message);
-      console.log((err as Error).message);
     }
+  });
+
+  ipcMain.on('stage-file', async (event, path, name) => {
+    stageFile(path, name).then((path) => {
+      try {
+        const cleanResponse = { ...path };
+        delete cleanResponse.isClean;
+        event.sender.send('stage-file-success', cleanResponse);
+      } catch (err) {
+        event.sender.send('stage-file-error', (err as Error).message);
+      }
+    });
   });
 
   ipcMain.on('get-status', (event, path) => {

@@ -11,10 +11,11 @@ import Dialog from './Dialog';
 
 export type StatusProps = {
   status: StatusResult | undefined;
+  onFileStage: (name: string) => void;
   removeCurrentRepo: () => void;
 };
 
-function Status({ status, removeCurrentRepo }: StatusProps) {
+function Status({ status, onFileStage, removeCurrentRepo }: StatusProps) {
   const transformStatus = convertGitResponse(status);
   const totalModified = Object.values(transformStatus).flat().length;
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -42,7 +43,11 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
         key: 's',
         description: 'stage file',
         function: () => {
-          console.log('stage file');
+          if (selectedIndex !== null) {
+            onFileStage(
+              findFileById(transformStatus, selectedIndex)?.path ?? '',
+            );
+          }
         },
       },
       {
@@ -123,7 +128,7 @@ function Status({ status, removeCurrentRepo }: StatusProps) {
         },
       },
     ],
-    [showMenu, removeCurrentRepo, selectedIndex, transformStatus],
+    [selectedIndex, transformStatus, onFileStage, showMenu, removeCurrentRepo],
   );
 
   useEffect(() => {

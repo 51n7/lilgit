@@ -28,6 +28,7 @@ export type ContextBridgeApi = {
     path: string | undefined,
     name: string,
   ) => Promise<BranchSummary>;
+  stageFile: (path: string | undefined, name: string) => Promise<StatusResult>;
   getStatus: (path: string | undefined) => Promise<StatusResult>;
 };
 
@@ -141,6 +142,19 @@ const exposedApi: ContextBridgeApi = {
         resolve(data),
       );
       ipcRenderer.once('delete-branch-error', (_event, error) =>
+        reject(new Error(error)),
+      );
+    });
+  },
+
+  stageFile: (path, name) => {
+    ipcRenderer.send('stage-file', path, name);
+
+    return new Promise((resolve, reject) => {
+      ipcRenderer.once('stage-file-success', (_event, data: StatusResult) =>
+        resolve(data),
+      );
+      ipcRenderer.once('stage-file-error', (_event, error) =>
         reject(new Error(error)),
       );
     });

@@ -11,7 +11,7 @@ function StatusList({ items, onItemClick, selectedIndex }: StatusListProps) {
     <ul>
       {items &&
         items.map((item, index) => (
-          <li key={item.id} id={`item-${index}`}>
+          <li key={item.id} id={`item-${index}`} data-status={item.status}>
             <span
               onClick={() => onItemClick(item)}
               style={{

@@ -85,6 +85,11 @@ header {
     li {
       position: relative;
 
+      &::before {
+        position: absolute;
+        right: calc(100% + 6px);
+      }
+
       span {
         display: inline-block;
         padding-inline: 0.4em;
@@ -93,8 +98,10 @@ header {
 
     .current::before {
       content: '\25B8';
-      position: absolute;
-      right: calc(100% + 6px);
+    }
+
+    [data-status='D']::before {
+      content: '-';
     }
   }
 }
