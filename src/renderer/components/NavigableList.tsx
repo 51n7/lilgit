@@ -15,17 +15,19 @@ function NavigableList({
     <ul>
       {items &&
         items.map((item, index) => (
-          <li key={item.id} id={`item-${index}`}>
+          <li
+            key={item.id}
+            id={`item-${index}`}
+            className={item.current ? 'current' : ''}
+          >
             <span
               onClick={() => onItemClick(item)}
               style={{
                 cursor: 'pointer',
-                backgroundColor:
-                  selectedIndex === item.id ? '#2f7351' : 'transparent',
+                backgroundColor: selectedIndex === item.id ? '#2f7351' : '',
               }}
             >
               {item.name}
-              {item.current ? '*' : ''}
             </span>
           </li>
         ))}

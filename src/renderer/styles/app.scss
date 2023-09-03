@@ -82,9 +82,19 @@ header {
   ul {
     padding-left: 1rem;
 
-    li span {
-      display: inline-block;
-      padding-inline: 0.25rem;
+    li {
+      position: relative;
+
+      span {
+        display: inline-block;
+        padding-inline: 0.4em;
+      }
+    }
+
+    .current::before {
+      content: '\25B8';
+      position: absolute;
+      right: calc(100% + 6px);
     }
   }
 }
@@ -151,8 +161,8 @@ nav {
   right: 10px;
   background-color: $red;
   color: #ffffff;
-  padding: 0.5rem;
-  text-align: center;
+  padding: 0.5em 1em;
+  text-align: left;
   width: 50%;
   z-index: 9999;
   transition: transform 250ms ease-in-out, opacity 250ms ease-in-out;
