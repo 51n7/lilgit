@@ -18,6 +18,8 @@ export type StatusProps = {
   stageAll: () => void;
   stageAllUntracked: () => void;
   unstageAll: () => void;
+  commit: (message: string) => void;
+  commitUnstaged: (message: string) => void;
   removeCurrentRepo: () => void;
 };
 
@@ -30,21 +32,25 @@ function Status({
   stageAll,
   stageAllUntracked,
   unstageAll,
+  commit,
+  commitUnstaged,
   removeCurrentRepo,
 }: StatusProps) {
   const transformStatus = convertGitResponse(status);
   const totalModified = Object.values(transformStatus).flat().length;
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [showCommitUnstagedDialog, setShowCommitUnstagedDialog] =
+    useState<boolean>(false);
   const [showCommitDialog, setShowCommitDialog] = useState<boolean>(false);
 
   const handleItemClick = (item: GitItem) => {
     setSelectedIndex(item.id ?? 0);
   };
 
-  const handleCommitDialog = (item: string) => {
-    console.log('commit: ', item);
-  };
+  // const handleCommitDialog = (item: string) => {
+  //   console.log('commit: ', item);
+  // };
 
   const keyMap = useMemo(
     () => [
@@ -67,6 +73,16 @@ function Status({
         },
       },
       {
+        key: 'a',
+        description: 'stage all unstaged files',
+        function: stageAll,
+      },
+      {
+        key: 'A',
+        description: 'stage all unstaged and untracked files',
+        function: stageAllUntracked,
+      },
+      {
         key: 'u',
         description: 'unstage file',
         function: () => {
@@ -75,6 +91,29 @@ function Status({
               findFileById(transformStatus, selectedIndex)?.path ?? '',
             );
           }
+        },
+      },
+      {
+        key: 'U',
+        description: 'unstage all staged files',
+        function: unstageAll,
+      },
+      {
+        key: 'c',
+        description: 'commit',
+        function: () => {
+          if (selectedIndex !== null) {
+            setShowCommitUnstagedDialog(
+              (showCommitUnstagedDialog) => !showCommitUnstagedDialog,
+            );
+          }
+        },
+      },
+      {
+        key: 'C',
+        description: 'commit, including unstaged',
+        function: () => {
+          setShowCommitDialog((showCommit) => !showCommit);
         },
       },
       {
@@ -92,39 +131,6 @@ function Status({
         key: 'D',
         description: 'discard all unstaged changes',
         function: onDiscard,
-      },
-      {
-        key: 'a',
-        description: 'stage all unstaged files',
-        function: stageAll,
-      },
-      {
-        key: 'A',
-        description: 'stage all unstaged and untracked files',
-        function: stageAllUntracked,
-      },
-      {
-        key: 'U',
-        description: 'unstage all staged files',
-        function: unstageAll,
-      },
-      {
-        key: 'c',
-        description: 'commit',
-        function: () => {
-          if (selectedIndex !== null) {
-            setShowCommitDialog((showCommit) => !showCommit);
-          }
-        },
-      },
-      {
-        key: 'C',
-        description: 'commit, including unstaged',
-        function: () => {
-          if (selectedIndex !== null) {
-            setShowCommitDialog((showCommit) => !showCommit);
-          }
-        },
       },
       {
         key: 'Escape',
@@ -191,7 +197,7 @@ function Status({
       }
     };
 
-    if (!showMenu && !showCommitDialog) {
+    if (!showMenu && !showCommitUnstagedDialog && !showCommitDialog) {
       window.addEventListener('keydown', handleKeyPress);
       return () => {
         window.removeEventListener('keydown', handleKeyPress);
@@ -204,6 +210,7 @@ function Status({
     selectedIndex,
     showMenu,
     showCommitDialog,
+    showCommitUnstagedDialog,
   ]);
 
   return (
@@ -230,7 +237,17 @@ function Status({
         title='Commit Message'
         isOpen={showCommitDialog}
         setIsOpen={setShowCommitDialog}
-        onSubmit={handleCommitDialog}
+        onSubmit={(message) => {
+          commit(message);
+        }}
+      />
+      <Dialog
+        title='Commit Message'
+        isOpen={showCommitUnstagedDialog}
+        setIsOpen={setShowCommitUnstagedDialog}
+        onSubmit={(message) => {
+          commitUnstaged(message);
+        }}
       />
     </div>
   );

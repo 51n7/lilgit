@@ -363,6 +363,36 @@ app.whenReady().then(() => {
     }
   });
 
+  ipcMain.on('commit', async (event, path, message) => {
+    const git = simpleGit(gitOptions(path));
+    try {
+      // await git.commit(message);
+      console.log(`commit: ${message}`);
+
+      event.sender.send(
+        'commit-success',
+        JSON.parse(JSON.stringify(await git.status())),
+      );
+    } catch (err) {
+      event.sender.send('commit-error', (err as Error).message);
+    }
+  });
+
+  ipcMain.on('commit-unstaged', async (event, path, message) => {
+    const git = simpleGit(gitOptions(path));
+    try {
+      // await git.commit(message);
+      console.log(`commit-unstaged: ${message}`);
+
+      event.sender.send(
+        'commit-success',
+        JSON.parse(JSON.stringify(await git.status())),
+      );
+    } catch (err) {
+      event.sender.send('commit-error', (err as Error).message);
+    }
+  });
+
   ipcMain.on('get-status', (event, path) => {
     getStatus(path).then((path) => {
       const cleanResponse = { ...path };

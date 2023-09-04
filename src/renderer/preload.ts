@@ -38,6 +38,11 @@ export type ContextBridgeApi = {
   stageAll: (path: string | undefined) => Promise<StatusResult>;
   stageAllUntracked: (path: string | undefined) => Promise<StatusResult>;
   unstageAll: (path: string | undefined) => Promise<StatusResult>;
+  commit: (path: string | undefined, message: string) => Promise<StatusResult>;
+  commitUnstaged: (
+    path: string | undefined,
+    message: string,
+  ) => Promise<StatusResult>;
   getStatus: (path: string | undefined) => Promise<StatusResult>;
 };
 
@@ -243,6 +248,33 @@ const exposedApi: ContextBridgeApi = {
         resolve(data),
       );
       ipcRenderer.once('unstage-all-error', (_event, error) =>
+        reject(new Error(error)),
+      );
+    });
+  },
+
+  commit: (path, message) => {
+    ipcRenderer.send('commit', path, message);
+
+    return new Promise((resolve, reject) => {
+      ipcRenderer.once('commit-success', (_event, data: StatusResult) =>
+        resolve(data),
+      );
+      ipcRenderer.once('commit-error', (_event, error) =>
+        reject(new Error(error)),
+      );
+    });
+  },
+
+  commitUnstaged: (path, message) => {
+    ipcRenderer.send('commit-unstaged', path, message);
+
+    return new Promise((resolve, reject) => {
+      ipcRenderer.once(
+        'commit-unstaged-success',
+        (_event, data: StatusResult) => resolve(data),
+      );
+      ipcRenderer.once('commit-unstaged-error', (_event, error) =>
         reject(new Error(error)),
       );
     });

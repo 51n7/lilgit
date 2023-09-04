@@ -25,6 +25,8 @@ const App = () => {
       stageAll={stageAll}
       stageAllUntracked={stageAllUntracked}
       unstageAll={unstageAll}
+      commitUnstaged={commitUnstaged}
+      commit={commit}
       removeCurrentRepo={removeCurrentRepo}
     />,
     <Branches
@@ -109,6 +111,24 @@ const App = () => {
   async function unstageAll() {
     try {
       setStatus(await window.api.unstageAll(currentRepo?.absolute));
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  }
+
+  async function commitUnstaged(message: string) {
+    try {
+      setStatus(
+        await window.api.commitUnstaged(currentRepo?.absolute, message),
+      );
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  }
+
+  async function commit(message: string) {
+    try {
+      setStatus(await window.api.commit(currentRepo?.absolute, message));
     } catch (error) {
       setError((error as Error).message);
     }
