@@ -33,6 +33,11 @@ export type ContextBridgeApi = {
     path: string | undefined,
     name: string,
   ) => Promise<StatusResult>;
+  discard: (path: string | undefined, name: string) => Promise<StatusResult>;
+  discardAll: (path: string | undefined) => Promise<StatusResult>;
+  stageAll: (path: string | undefined) => Promise<StatusResult>;
+  stageAllUntracked: (path: string | undefined) => Promise<StatusResult>;
+  unstageAll: (path: string | undefined) => Promise<StatusResult>;
   getStatus: (path: string | undefined) => Promise<StatusResult>;
 };
 
@@ -172,6 +177,72 @@ const exposedApi: ContextBridgeApi = {
         resolve(data),
       );
       ipcRenderer.once('unstage-file-error', (_event, error) =>
+        reject(new Error(error)),
+      );
+    });
+  },
+
+  discard: (path, name) => {
+    ipcRenderer.send('discard', path, name);
+
+    return new Promise((resolve, reject) => {
+      ipcRenderer.once('discard-success', (_event, data: StatusResult) =>
+        resolve(data),
+      );
+      ipcRenderer.once('discard-error', (_event, error) =>
+        reject(new Error(error)),
+      );
+    });
+  },
+
+  discardAll: (path) => {
+    ipcRenderer.send('discard-all', path);
+
+    return new Promise((resolve, reject) => {
+      ipcRenderer.once('discard-all-success', (_event, data: StatusResult) =>
+        resolve(data),
+      );
+      ipcRenderer.once('discard-all-error', (_event, error) =>
+        reject(new Error(error)),
+      );
+    });
+  },
+
+  stageAll: (path) => {
+    ipcRenderer.send('stage-all', path);
+
+    return new Promise((resolve, reject) => {
+      ipcRenderer.once('stage-all-success', (_event, data: StatusResult) =>
+        resolve(data),
+      );
+      ipcRenderer.once('stage-all-error', (_event, error) =>
+        reject(new Error(error)),
+      );
+    });
+  },
+
+  stageAllUntracked: (path) => {
+    ipcRenderer.send('stage-all-untracked', path);
+
+    return new Promise((resolve, reject) => {
+      ipcRenderer.once(
+        'stage-all-untracked-success',
+        (_event, data: StatusResult) => resolve(data),
+      );
+      ipcRenderer.once('stage-all-untracked-error', (_event, error) =>
+        reject(new Error(error)),
+      );
+    });
+  },
+
+  unstageAll: (path) => {
+    ipcRenderer.send('unstage-all', path);
+
+    return new Promise((resolve, reject) => {
+      ipcRenderer.once('unstage-all-success', (_event, data: StatusResult) =>
+        resolve(data),
+      );
+      ipcRenderer.once('unstage-all-error', (_event, error) =>
         reject(new Error(error)),
       );
     });

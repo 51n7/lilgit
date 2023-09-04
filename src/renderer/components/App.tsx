@@ -20,6 +20,11 @@ const App = () => {
       status={status}
       onFileStage={onFileStage}
       onFileUnstage={onFileUnstage}
+      onFileDiscard={onFileDiscard}
+      onDiscard={onDiscard}
+      stageAll={stageAll}
+      stageAllUntracked={stageAllUntracked}
+      unstageAll={unstageAll}
       removeCurrentRepo={removeCurrentRepo}
     />,
     <Branches
@@ -64,6 +69,46 @@ const App = () => {
   async function onFileUnstage(name: string) {
     try {
       setStatus(await window.api.unstageFile(currentRepo?.absolute, name));
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  }
+
+  async function onFileDiscard(name: string) {
+    try {
+      setStatus(await window.api.discard(currentRepo?.absolute, name));
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  }
+
+  async function onDiscard() {
+    try {
+      setStatus(await window.api.discardAll(currentRepo?.absolute));
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  }
+
+  async function stageAll() {
+    try {
+      setStatus(await window.api.stageAll(currentRepo?.absolute));
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  }
+
+  async function stageAllUntracked() {
+    try {
+      setStatus(await window.api.stageAllUntracked(currentRepo?.absolute));
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  }
+
+  async function unstageAll() {
+    try {
+      setStatus(await window.api.unstageAll(currentRepo?.absolute));
     } catch (error) {
       setError((error as Error).message);
     }

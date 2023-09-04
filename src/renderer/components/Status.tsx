@@ -13,6 +13,11 @@ export type StatusProps = {
   status: StatusResult | undefined;
   onFileStage: (name: string) => void;
   onFileUnstage: (name: string) => void;
+  onFileDiscard: (name: string) => void;
+  onDiscard: () => void;
+  stageAll: () => void;
+  stageAllUntracked: () => void;
+  unstageAll: () => void;
   removeCurrentRepo: () => void;
 };
 
@@ -20,6 +25,11 @@ function Status({
   status,
   onFileStage,
   onFileUnstage,
+  onFileDiscard,
+  onDiscard,
+  stageAll,
+  stageAllUntracked,
+  unstageAll,
   removeCurrentRepo,
 }: StatusProps) {
   const transformStatus = convertGitResponse(status);
@@ -71,43 +81,37 @@ function Status({
         key: 'd',
         description: 'discard changes to file',
         function: () => {
-          console.log('discard changes to file');
+          if (selectedIndex !== null) {
+            onFileDiscard(
+              findFileById(transformStatus, selectedIndex)?.path ?? '',
+            );
+          }
         },
       },
       {
         key: 'D',
         description: 'discard all unstaged changes',
-        function: () => {
-          console.log('discard all unstaged changes');
-        },
+        function: onDiscard,
       },
       {
         key: 'a',
         description: 'stage all unstaged files',
-        function: () => {
-          console.log('stage all unstaged files');
-        },
+        function: stageAll,
       },
       {
         key: 'A',
         description: 'stage all unstaged and untracked files',
-        function: () => {
-          console.log('stage all unstaged and untracked files');
-        },
+        function: stageAllUntracked,
       },
       {
         key: 'U',
         description: 'unstage all staged files',
-        function: () => {
-          console.log('unstage all staged files');
-        },
+        function: unstageAll,
       },
       {
         key: 'c',
         description: 'commit',
         function: () => {
-          console.log('commit');
-
           if (selectedIndex !== null) {
             setShowCommitDialog((showCommit) => !showCommit);
           }
@@ -117,7 +121,9 @@ function Status({
         key: 'C',
         description: 'commit, including unstaged',
         function: () => {
-          console.log('commit, including unstaged');
+          if (selectedIndex !== null) {
+            setShowCommitDialog((showCommit) => !showCommit);
+          }
         },
       },
       {
@@ -143,6 +149,11 @@ function Status({
       onFileStage,
       transformStatus,
       onFileUnstage,
+      onFileDiscard,
+      onDiscard,
+      stageAll,
+      stageAllUntracked,
+      unstageAll,
       showMenu,
       removeCurrentRepo,
     ],

@@ -280,20 +280,86 @@ app.whenReady().then(() => {
     try {
       await git.reset(['--mixed', name]);
 
-      /*
-      unfortunately the git lib doesnt support `git restore file/to/revert.txt`, it was only added to git in 2019.. 🤷
-      this workaround uses the git cli equivalent of: git checkout HEAD -- file/to/revert.txt */
-      // await git.checkout(['HEAD', '--', name]);
-
-      // await git.reset(['--hard']); // revert any uncommitted changes
-      // await git.clean('df'); // remove untracked files AND directories
-
       event.sender.send(
         'unstage-file-success',
         JSON.parse(JSON.stringify(await git.status())),
       );
     } catch (err) {
       event.sender.send('unstage-file-error', (err as Error).message);
+    }
+  });
+
+  ipcMain.on('discard', async (event, path, name) => {
+    const git = simpleGit(gitOptions(path));
+    try {
+      /*
+      unfortunately the git lib doesnt support `git restore file/to/revert.txt`, it was only added to git in 2019.. 🤷
+      this workaround uses the git cli equivalent of: git checkout HEAD -- file/to/revert.txt */
+      await git.checkout(['HEAD', '--', name]);
+
+      event.sender.send(
+        'discard-success',
+        JSON.parse(JSON.stringify(await git.status())),
+      );
+    } catch (err) {
+      event.sender.send('discard-error', (err as Error).message);
+    }
+  });
+
+  ipcMain.on('discard-all', async (event, path) => {
+    const git = simpleGit(gitOptions(path));
+    try {
+      await git.reset(['--hard']); // revert any uncommitted changes
+      await git.clean('df'); // remove untracked files AND directories
+
+      event.sender.send(
+        'discard-all-success',
+        JSON.parse(JSON.stringify(await git.status())),
+      );
+    } catch (err) {
+      event.sender.send('discard-all-error', (err as Error).message);
+    }
+  });
+
+  ipcMain.on('stage-all', async (event, path) => {
+    const git = simpleGit(gitOptions(path));
+    try {
+      await git.add('-u');
+
+      event.sender.send(
+        'stage-all-success',
+        JSON.parse(JSON.stringify(await git.status())),
+      );
+    } catch (err) {
+      event.sender.send('stage-all-error', (err as Error).message);
+    }
+  });
+
+  ipcMain.on('stage-all-untracked', async (event, path) => {
+    const git = simpleGit(gitOptions(path));
+    try {
+      await git.add('-A');
+
+      event.sender.send(
+        'stage-all-untracked-success',
+        JSON.parse(JSON.stringify(await git.status())),
+      );
+    } catch (err) {
+      event.sender.send('stage-all-untracked-error', (err as Error).message);
+    }
+  });
+
+  ipcMain.on('unstage-all', async (event, path) => {
+    const git = simpleGit(gitOptions(path));
+    try {
+      await git.reset(['--mixed']);
+
+      event.sender.send(
+        'unstage-all-success',
+        JSON.parse(JSON.stringify(await git.status())),
+      );
+    } catch (err) {
+      event.sender.send('unstage-all-error', (err as Error).message);
     }
   });
 
