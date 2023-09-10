@@ -102,18 +102,16 @@ function Status({
         key: 'c',
         description: 'commit',
         function: () => {
-          if (selectedIndex !== null) {
-            setShowCommitUnstagedDialog(
-              (showCommitUnstagedDialog) => !showCommitUnstagedDialog,
-            );
-          }
+          setShowCommitDialog((showCommit) => !showCommit);
         },
       },
       {
         key: 'C',
         description: 'commit, including unstaged',
         function: () => {
-          setShowCommitDialog((showCommit) => !showCommit);
+          setShowCommitUnstagedDialog(
+            (showCommitUnstagedDialog) => !showCommitUnstagedDialog,
+          );
         },
       },
       {

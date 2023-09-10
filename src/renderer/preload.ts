@@ -3,9 +3,9 @@
 // `contextBridge` expose an API to the renderer process.
 // `ipcRenderer` is used for IPC (inter-process communication) with main process.
 // We use it in the preload instead of renderer in order to expose only
-// whitelisted wrappers to increase the security of our aplication.
+// whitelisted wrappers to increase the security of our application.
 import { contextBridge, ipcRenderer } from 'electron';
-import { RepoPathProp } from 'src/types';
+import { RepoPathProp, GitLogEntry } from 'src/types';
 import { BranchSummary, StatusResult } from 'simple-git';
 
 // Create a type that should contain all the data we need to expose in the
@@ -19,6 +19,7 @@ export type ContextBridgeApi = {
   savePath: (path: RepoPathProp) => Promise<RepoPathProp>;
   getPath: () => Promise<RepoPathProp>;
   getBranches: (path: string | undefined) => Promise<BranchSummary>;
+  getLog: (path: string | undefined) => Promise<GitLogEntry[]>;
   checkoutBranch: (
     path: string | undefined,
     branch: string,
@@ -119,6 +120,16 @@ const exposedApi: ContextBridgeApi = {
 
     return new Promise((resolve) => {
       ipcRenderer.once('get-branches-success', (_event, data: BranchSummary) =>
+        resolve(data),
+      );
+    });
+  },
+
+  getLog: (path) => {
+    ipcRenderer.send('get-log', path);
+
+    return new Promise((resolve) => {
+      ipcRenderer.once('get-log-success', (_event, data: GitLogEntry[]) =>
         resolve(data),
       );
     });

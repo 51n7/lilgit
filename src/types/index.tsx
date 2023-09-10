@@ -27,11 +27,6 @@ export type TransformBranches = {
   [remoteName: string]: TransformBranch[] | undefined;
 };
 
-// export type ListItem = {
-//   id: number;
-//   text: string;
-// };
-
 export type GitItem = {
   id?: number;
   path: string;
@@ -43,4 +38,12 @@ export type TransformedStatus = {
   unstaged?: GitItem[];
   untracked?: GitItem[];
   staged?: GitItem[];
+};
+
+export type GitLogEntry = {
+  graph: string;
+  commit: string | undefined;
+  message: string | undefined;
+  name: string | undefined;
+  time: string | undefined;
 };

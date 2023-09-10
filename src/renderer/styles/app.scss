@@ -14,6 +14,7 @@ $white: #acb9c6;
 $grey-light: #adbac7;
 $grey: #768390;
 $red: #f47067;
+$green: #8ddb8c;
 // $blue-light: #6bb5fd;
 $blue: #6cb6ff;
 
@@ -47,6 +48,10 @@ button {
 
 .text-red {
   color: $red;
+}
+
+.text-green {
+  color: $green;
 }
 
 .text-blue {
@@ -102,6 +107,35 @@ header {
 
     [data-status='D']::before {
       content: '-';
+    }
+  }
+}
+
+.view-graph {
+  .line {
+    display: flex;
+    justify-content: space-between;
+
+    .ellipsis {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .message {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    span {
+      // display: inline-block;
+      margin-inline: 0.5rem;
+
+      &:first-child {
+        margin-inline-start: 0;
+      }
     }
   }
 }

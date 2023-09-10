@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { RepoPathProp, TransformBranch } from 'src/types';
+import { RepoPathProp, TransformBranch, GitLogEntry } from 'src/types';
 import { StatusResult, BranchSummary } from 'simple-git';
 import Status from './Status';
 import Branches from './Branches';
@@ -12,6 +12,7 @@ const App = () => {
   const [currentRepo, setCurrentRepo] = useState<RepoPathProp | undefined>();
   const [status, setStatus] = useState<StatusResult>();
   const [branchList, setBranchList] = useState<BranchSummary>();
+  const [graphList, setGraphList] = useState<GitLogEntry[]>();
   const [viewState, setViewState] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +37,7 @@ const App = () => {
       onBranchDelete={deleteBranch}
       removeCurrentRepo={removeCurrentRepo}
     />,
-    <Graph />,
+    <Graph graph={graphList} removeCurrentRepo={removeCurrentRepo} />,
   ];
 
   async function deleteRepo(index: number) {
@@ -173,6 +174,7 @@ const App = () => {
         setRepoList(await window.api.getRepos());
         setBranchList(await window.api.getBranches(repo?.absolute));
         setStatus(await window.api.getStatus(repo?.absolute));
+        setGraphList(await window.api.getLog(repo?.absolute));
       } catch (error) {
         console.error('Error fetching:', error);
       }
@@ -204,6 +206,7 @@ const App = () => {
     const fetchData = async () => {
       setBranchList(await window.api.getBranches(currentRepo?.absolute));
       setStatus(await window.api.getStatus(currentRepo?.absolute));
+      setGraphList(await window.api.getLog(currentRepo?.absolute));
     };
     fetchData().catch(console.error);
   }, [currentRepo]);

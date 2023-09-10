@@ -150,7 +150,7 @@ async function addBranch(path: string, name: string) {
   }
 }
 
-async function delteBranch(path: string, name: string) {
+async function deleteBranch(path: string, name: string) {
   if (path) {
     const git = simpleGit(gitOptions(path));
     await git.deleteLocalBranch(name);
@@ -240,6 +240,37 @@ app.whenReady().then(() => {
     });
   });
 
+  ipcMain.on('get-log', async (event, path) => {
+    const git = simpleGit(gitOptions(path));
+    const customFormat = '<λ> %h <λ> %s <λ> %an <λ> %at'; // https://git-scm.com/docs/git-log
+
+    git.raw(
+      ['log', '--graph', '--oneline', `--format=${customFormat}`],
+      (err, log) => {
+        if (err) {
+          event.sender.send('get-log-error', (err as Error).message);
+        } else {
+          const formattedLog = log.split('\n').map((line) => {
+            const [graph, commit, message, name, time] = line.split('<λ>');
+
+            return {
+              graph: graph.trim(),
+              commit: commit?.trim(),
+              message: message?.trim(),
+              name: name?.trim(),
+              time: time?.trim(),
+            };
+          });
+
+          event.sender.send(
+            'get-log-success',
+            JSON.parse(JSON.stringify(formattedLog)),
+          );
+        }
+      },
+    );
+  });
+
   ipcMain.on('checkout-branch', (event, path, branch) => {
     checkoutBranch(path, branch).then((path) => {
       event.sender.send('checkout-branch-success', path);
@@ -256,7 +287,10 @@ app.whenReady().then(() => {
 
   ipcMain.on('delete-branch', async (event, path, name) => {
     try {
-      event.sender.send('delete-branch-success', await delteBranch(path, name));
+      event.sender.send(
+        'delete-branch-success',
+        await deleteBranch(path, name),
+      );
     } catch (err) {
       event.sender.send('delete-branch-error', (err as Error).message);
     }
@@ -366,8 +400,7 @@ app.whenReady().then(() => {
   ipcMain.on('commit', async (event, path, message) => {
     const git = simpleGit(gitOptions(path));
     try {
-      // await git.commit(message);
-      console.log(`commit: ${message}`);
+      await git.commit(message);
 
       event.sender.send(
         'commit-success',
@@ -381,15 +414,14 @@ app.whenReady().then(() => {
   ipcMain.on('commit-unstaged', async (event, path, message) => {
     const git = simpleGit(gitOptions(path));
     try {
-      // await git.commit(message);
-      console.log(`commit-unstaged: ${message}`);
+      await git.commit(message, ['-a']);
 
       event.sender.send(
-        'commit-success',
+        'commit-unstaged-success',
         JSON.parse(JSON.stringify(await git.status())),
       );
     } catch (err) {
-      event.sender.send('commit-error', (err as Error).message);
+      event.sender.send('commit-unstaged-error', (err as Error).message);
     }
   });
 
