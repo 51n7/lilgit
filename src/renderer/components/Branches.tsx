@@ -13,6 +13,9 @@ function Branches({
   onBranchCheckout,
   onBranchNew,
   onBranchDelete,
+  onBranchPull,
+  onBranchPush,
+  onBranchMerge,
   removeCurrentRepo,
 }: RepoProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -77,9 +80,30 @@ function Branches({
       },
       {
         key: 'p',
+        description: 'pull selected branch',
+        function: () => {
+          if (selectedIndex !== null) {
+            const selectedBranch = findBranchById(
+              transformBranches,
+              selectedIndex,
+            );
+
+            onBranchPull(selectedBranch?.name ?? '');
+          }
+        },
+      },
+      {
+        key: 'P',
         description: 'push selected to remote',
         function: () => {
-          console.log('push');
+          if (selectedIndex !== null) {
+            const selectedBranch = findBranchById(
+              transformBranches,
+              selectedIndex,
+            );
+
+            onBranchPush(selectedBranch?.name ?? '');
+          }
         },
       },
       {
@@ -93,7 +117,14 @@ function Branches({
         key: 'm',
         description: 'merge selected into active branch',
         function: () => {
-          console.log('merge');
+          if (selectedIndex !== null) {
+            const selectedBranch = findBranchById(
+              transformBranches,
+              selectedIndex,
+            );
+
+            onBranchMerge(selectedBranch?.name ?? '', branches?.current ?? '');
+          }
         },
       },
       {
@@ -111,6 +142,10 @@ function Branches({
       transformBranches,
       onBranchCheckout,
       onBranchDelete,
+      onBranchPull,
+      onBranchPush,
+      onBranchMerge,
+      branches,
       showMenu,
       newBranchDialog,
       removeCurrentRepo,

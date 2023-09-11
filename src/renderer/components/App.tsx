@@ -35,6 +35,9 @@ const App = () => {
       onBranchCheckout={updateBranches}
       onBranchNew={addBranch}
       onBranchDelete={deleteBranch}
+      onBranchPull={pullBranch}
+      onBranchPush={pushBranch}
+      onBranchMerge={mergeBranch}
       removeCurrentRepo={removeCurrentRepo}
     />,
     <Graph graph={graphList} removeCurrentRepo={removeCurrentRepo} />,
@@ -152,6 +155,30 @@ const App = () => {
   async function deleteBranch(name: string) {
     try {
       setBranchList(await window.api.deleteBranch(currentRepo?.absolute, name));
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  }
+
+  async function pullBranch(branch: string) {
+    try {
+      await window.api.pullBranch(currentRepo?.absolute, branch);
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  }
+
+  async function pushBranch(branch: string) {
+    try {
+      await window.api.pushBranch(currentRepo?.absolute, branch);
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  }
+
+  async function mergeBranch(selected: string, current: string) {
+    try {
+      await window.api.mergeBranch(currentRepo?.absolute, selected, current);
     } catch (error) {
       setError((error as Error).message);
     }

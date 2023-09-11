@@ -44,6 +44,13 @@ export type ContextBridgeApi = {
     path: string | undefined,
     message: string,
   ) => Promise<StatusResult>;
+  pullBranch: (path: string | undefined, branch: string) => Promise<string>;
+  pushBranch: (path: string | undefined, branch: string) => Promise<string>;
+  mergeBranch: (
+    path: string | undefined,
+    selected: string,
+    current: string,
+  ) => Promise<string>;
   getStatus: (path: string | undefined) => Promise<StatusResult>;
 };
 
@@ -286,6 +293,45 @@ const exposedApi: ContextBridgeApi = {
         (_event, data: StatusResult) => resolve(data),
       );
       ipcRenderer.once('commit-unstaged-error', (_event, error) =>
+        reject(new Error(error)),
+      );
+    });
+  },
+
+  pullBranch: (path, branch) => {
+    ipcRenderer.send('pull-branch', path, branch);
+
+    return new Promise((resolve, reject) => {
+      ipcRenderer.once('pull-branch-success', (_event, data: string) =>
+        resolve(data),
+      );
+      ipcRenderer.once('pull-branch-error', (_event, error) =>
+        reject(new Error(error)),
+      );
+    });
+  },
+
+  pushBranch: (path, branch) => {
+    ipcRenderer.send('push-branch', path, branch);
+
+    return new Promise((resolve, reject) => {
+      ipcRenderer.once('push-branch-success', (_event, data: string) =>
+        resolve(data),
+      );
+      ipcRenderer.once('push-branch-error', (_event, error) =>
+        reject(new Error(error)),
+      );
+    });
+  },
+
+  mergeBranch: (path, selected, current) => {
+    ipcRenderer.send('merge-branch', path, selected, current);
+
+    return new Promise((resolve, reject) => {
+      ipcRenderer.once('merge-branch-success', (_event, data: string) =>
+        resolve(data),
+      );
+      ipcRenderer.once('merge-branch-error', (_event, error) =>
         reject(new Error(error)),
       );
     });

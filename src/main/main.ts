@@ -425,6 +425,48 @@ app.whenReady().then(() => {
     }
   });
 
+  ipcMain.on('pull-branch', async (event, path, branch) => {
+    // const git = simpleGit(gitOptions(path));
+    try {
+      // event.sender.send(
+      //   'pull-branch-success',
+      //   await git.status(),
+      // );
+      // console.log(path, branch);
+      console.log(`pull: ${branch}`);
+    } catch (err) {
+      event.sender.send('pull-branch-error', (err as Error).message);
+    }
+  });
+
+  ipcMain.on('push-branch', async (event, path, branch) => {
+    // const git = simpleGit(gitOptions(path));
+    try {
+      // event.sender.send(
+      //   'push-branch-success',
+      //   await git.status(),
+      // );
+      // console.log(path, branch);
+      console.log(`push: ${branch}`);
+    } catch (err) {
+      event.sender.send('push-branch-error', (err as Error).message);
+    }
+  });
+
+  ipcMain.on('merge-branch', async (event, path, selected, current) => {
+    // const git = simpleGit(gitOptions(path));
+    try {
+      // event.sender.send(
+      //   'merge-branch-success',
+      //   await git.status(),
+      // );
+      // console.log(path, selected, current);
+      console.log(`merge: ${selected} ${current}`);
+    } catch (err) {
+      event.sender.send('merge-branch-error', (err as Error).message);
+    }
+  });
+
   ipcMain.on('get-status', (event, path) => {
     getStatus(path).then((path) => {
       const cleanResponse = { ...path };
