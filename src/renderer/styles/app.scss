@@ -18,6 +18,10 @@ $green: #8ddb8c;
 // $blue-light: #6bb5fd;
 $blue: #6cb6ff;
 
+::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   background-color: $bg;
   color: #dfe5ff;
