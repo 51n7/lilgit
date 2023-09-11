@@ -1,16 +1,12 @@
 import { TransformBranch } from 'src/types';
 
-type NavigableListProps = {
+type BranchListProps = {
   items: TransformBranch[] | undefined;
   onItemClick: (item: TransformBranch) => void;
   selectedIndex: number | null;
 };
 
-function NavigableList({
-  items,
-  onItemClick,
-  selectedIndex,
-}: NavigableListProps) {
+function BranchesList({ items, onItemClick, selectedIndex }: BranchListProps) {
   return (
     <ul>
       {items &&
@@ -35,4 +31,4 @@ function NavigableList({
   );
 }
 
-export default NavigableList;
+export default BranchesList;

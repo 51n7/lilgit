@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { RepoProps, TransformBranch } from 'src/types';
-import NavigableList from './NavigableList';
+import BranchesList from './BranchesList';
 import {
   findBranchById,
   transformBranch,
@@ -173,7 +173,7 @@ function Branches({
             <p className='text-red'>
               {section === 'local' ? 'LOCAL:' : `REMOTE (${section}):`}
             </p>
-            <NavigableList
+            <BranchesList
               items={transformBranches[section]}
               selectedIndex={selectedIndex}
               onItemClick={handleItemClick}
