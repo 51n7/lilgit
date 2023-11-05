@@ -6,6 +6,7 @@ import Branches from './Branches';
 import Graph from './Graph';
 import RepoList from './RepoList';
 import ErrorNotification from './ErrorNotification';
+import Output from './Output';
 
 const App = () => {
   const [repoList, setRepoList] = useState<RepoPathProp[]>([]);
@@ -273,6 +274,7 @@ const App = () => {
       {error && (
         <ErrorNotification message={error} clearError={() => setError(null)} />
       )}
+      <Output />
     </>
   );
 };
