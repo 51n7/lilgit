@@ -426,7 +426,8 @@ app.whenReady().then(() => {
   });
 
   ipcMain.on('pull-branch', async (event, path, branch) => {
-    // const git = simpleGit(gitOptions(path));
+    const git = simpleGit(gitOptions(path));
+    // await git.pull('origin', 'main123');
     try {
       // event.sender.send(
       //   'pull-branch-success',
@@ -434,8 +435,11 @@ app.whenReady().then(() => {
       // );
       // console.log(path, branch);
       console.log(`pull: ${branch}`);
+      // await git.pull();
+      await git.pull('origin', 'main123');
     } catch (err) {
       event.sender.send('pull-branch-error', (err as Error).message);
+      // console.error('failed: ', err);
     }
   });
 

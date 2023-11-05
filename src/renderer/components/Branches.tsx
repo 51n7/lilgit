@@ -17,6 +17,7 @@ function Branches({
   onBranchPush,
   onBranchMerge,
   removeCurrentRepo,
+  outputOpen,
 }: RepoProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -130,7 +131,7 @@ function Branches({
       {
         key: 'Escape',
         function: () => {
-          if (!showMenu && !newBranchDialog) {
+          if (!showMenu && !outputOpen && !newBranchDialog) {
             setSelectedIndex(null);
             removeCurrentRepo();
           }
@@ -149,6 +150,7 @@ function Branches({
       showMenu,
       newBranchDialog,
       removeCurrentRepo,
+      outputOpen,
     ],
   );
 

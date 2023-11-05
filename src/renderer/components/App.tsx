@@ -16,6 +16,7 @@ const App = () => {
   const [graphList, setGraphList] = useState<GitLogEntry[]>();
   const [viewState, setViewState] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
+  const [output, setOutput] = useState<string | null>(null);
 
   const views = [
     <Status
@@ -30,6 +31,7 @@ const App = () => {
       commitUnstaged={commitUnstaged}
       commit={commit}
       removeCurrentRepo={removeCurrentRepo}
+      outputOpen={!!output}
     />,
     <Branches
       branches={branchList}
@@ -40,6 +42,7 @@ const App = () => {
       onBranchPush={pushBranch}
       onBranchMerge={mergeBranch}
       removeCurrentRepo={removeCurrentRepo}
+      outputOpen={!!output}
     />,
     <Graph graph={graphList} removeCurrentRepo={removeCurrentRepo} />,
   ];
@@ -165,7 +168,7 @@ const App = () => {
     try {
       await window.api.pullBranch(currentRepo?.absolute, branch);
     } catch (error) {
-      setError((error as Error).message);
+      setOutput((error as Error).message);
     }
   }
 
@@ -274,7 +277,13 @@ const App = () => {
       {error && (
         <ErrorNotification message={error} clearError={() => setError(null)} />
       )}
-      <Output />
+      {output && (
+        <Output
+          message={output}
+          isOpen={!!output}
+          clearOutput={() => setOutput(null)}
+        />
+      )}
     </>
   );
 };

@@ -1,8 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-function Output() {
+interface OutputNotificationProps {
+  message: string;
+  isOpen: boolean;
+  clearOutput: () => void;
+}
+
+function Output({ message, isOpen, clearOutput }: OutputNotificationProps) {
   const [height, setHeight] = useState<number>(100);
   const [isResizing, setIsResizing] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        clearOutput();
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyPress);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [isOpen, clearOutput]);
 
   const startResize = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -35,7 +57,7 @@ function Output() {
         &nbsp;
       </div>
       <div className='content' style={{ height: `${height}px` }}>
-        output message
+        {message}
       </div>
     </div>
   );

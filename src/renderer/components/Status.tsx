@@ -21,6 +21,7 @@ export type StatusProps = {
   commit: (message: string) => void;
   commitUnstaged: (message: string) => void;
   removeCurrentRepo: () => void;
+  outputOpen: boolean;
 };
 
 function Status({
@@ -35,6 +36,7 @@ function Status({
   commit,
   commitUnstaged,
   removeCurrentRepo,
+  outputOpen,
 }: StatusProps) {
   const transformStatus = convertGitResponse(status);
   const totalModified = Object.values(transformStatus).flat().length;
@@ -133,7 +135,7 @@ function Status({
       {
         key: 'Escape',
         function: () => {
-          if (!showMenu) {
+          if (!showMenu && !outputOpen) {
             setSelectedIndex(null);
             removeCurrentRepo();
           }
@@ -160,6 +162,7 @@ function Status({
       unstageAll,
       showMenu,
       removeCurrentRepo,
+      outputOpen,
     ],
   );
 
