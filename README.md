@@ -1,11 +1,27 @@
 # lilgit
 
+## Test application
+
+This application is still in development and has not been packaged. To test you can clone this repo and run the following:
+
+```
+npm install
+npm run start
+```
+
 ### Shortcuts
 | Command         | Shortcut             |
 | :-------------- | :------------------- |
 | Open Menu       | <kbd>Shift + /</kbd> |
 | Navigate Views  | <kbd>Tab</kbd>       |
 | Navigate Back   | <kbd>Esc</kbd>       |
+
+
+## Usage
+
+The application relies on one simple menu that can be opened by hitting `?` (or `shift + /` 🤷) and navigating up/down.
+
+## Examples
 
 <table>
     <tr>
