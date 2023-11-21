@@ -428,6 +428,10 @@ app.whenReady().then(() => {
   ipcMain.on('pull-branch', async (event, path, branch) => {
     const git = simpleGit(gitOptions(path));
     // await git.pull('origin', 'main123');
+
+    event.sender.send('process-started');
+    // mainWindow?.webContents.send('process-started');
+
     try {
       // event.sender.send(
       //   'pull-branch-success',

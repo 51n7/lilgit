@@ -160,9 +160,32 @@ nav {
   justify-content: center;
   background-color: rgb($bg, 75%);
 
-  fieldset {
+  fieldset,
+  .loading {
     background-color: $bg;
     min-width: 75%;
+    border: 2px solid $white;
+  }
+
+  .loading {
+    min-height: 3.5rem;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .loading:after {
+    content: '...';
+    overflow: hidden;
+    display: inline-block;
+    animation: ellipsis steps(4, end) 900ms infinite;
+    width: 0px;
+  }
+
+  @keyframes ellipsis {
+    to {
+      width: 2em;
+    }
   }
 
   legend {

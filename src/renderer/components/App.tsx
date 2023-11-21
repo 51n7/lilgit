@@ -7,8 +7,10 @@ import Graph from './Graph';
 import RepoList from './RepoList';
 import ErrorNotification from './ErrorNotification';
 import Output from './Output';
+import Loading from './Loading';
 
 const App = () => {
+  const [loading, setLoading] = useState(false);
   const [repoList, setRepoList] = useState<RepoPathProp[]>([]);
   const [currentRepo, setCurrentRepo] = useState<RepoPathProp | undefined>();
   const [status, setStatus] = useState<StatusResult>();
@@ -170,6 +172,7 @@ const App = () => {
     } catch (error) {
       setOutput((error as Error).message);
     }
+    setLoading(false);
   }
 
   async function pushBranch(branch: string) {
@@ -198,6 +201,8 @@ const App = () => {
   }
 
   useEffect(() => {
+    window.api.onProcessStarted(() => setLoading(true));
+
     const fetchRepos = async () => {
       try {
         const repo = await window.api.getCurrent();
@@ -284,6 +289,7 @@ const App = () => {
           clearOutput={() => setOutput(null)}
         />
       )}
+      <Loading message='Pulling' isOpen={loading} />
     </>
   );
 };
