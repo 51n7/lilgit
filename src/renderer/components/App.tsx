@@ -10,7 +10,7 @@ import Output from './Output';
 import Loading from './Loading';
 
 const App = () => {
-  const [loading, setLoading] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState<string>('');
   const [repoList, setRepoList] = useState<RepoPathProp[]>([]);
   const [currentRepo, setCurrentRepo] = useState<RepoPathProp | undefined>();
   const [status, setStatus] = useState<StatusResult>();
@@ -172,23 +172,25 @@ const App = () => {
     } catch (error) {
       setOutput((error as Error).message);
     }
-    setLoading(false);
+    setLoadingMsg('');
   }
 
   async function pushBranch(branch: string) {
     try {
       await window.api.pushBranch(currentRepo?.absolute, branch);
     } catch (error) {
-      setError((error as Error).message);
+      setOutput((error as Error).message);
     }
+    setLoadingMsg('');
   }
 
   async function mergeBranch(selected: string, current: string) {
     try {
       await window.api.mergeBranch(currentRepo?.absolute, selected, current);
     } catch (error) {
-      setError((error as Error).message);
+      setOutput((error as Error).message);
     }
+    setLoadingMsg('');
   }
 
   async function folderSelect() {
@@ -201,7 +203,9 @@ const App = () => {
   }
 
   useEffect(() => {
-    window.api.onProcessStarted(() => setLoading(true));
+    window.api.onProcessStarted((message: string) => {
+      setLoadingMsg(message);
+    });
 
     const fetchRepos = async () => {
       try {
@@ -257,15 +261,32 @@ const App = () => {
             <span></span>
           </div>
           <header>
-            <p>
-              <em>Repo:</em> {currentRepo.short}
-            </p>
+            <div className='row'>
+              <em className='title'>Repo:</em>
+              <div className='details text-grey'>{currentRepo.short}</div>
+            </div>
             {status?.current && (
-              <p>
-                <em>Branch:</em> On branch{' '}
-                <span className='text-blue'>`{status?.current}`</span> tracking{' '}
-                <span className='text-blue'>`{status?.tracking}`</span>
-              </p>
+              <div className='row'>
+                <em className='title'>Branch:</em>
+                <div className='details'>
+                  On branch{' '}
+                  <span className='text-blue'>`{status?.current}`</span>{' '}
+                  tracking{' '}
+                  <span className='text-blue'>`{status?.tracking}`</span>
+                  {!!status?.ahead && (
+                    <p>
+                      You're <span className='text-red'>ahead</span> by{' '}
+                      {status?.ahead}
+                    </p>
+                  )}
+                  {!!status?.behind && (
+                    <p>
+                      You're <span className='text-red'>behind</span> by{' '}
+                      {status?.behind}
+                    </p>
+                  )}
+                </div>
+              </div>
             )}
           </header>
           {views[viewState]}
@@ -289,7 +310,7 @@ const App = () => {
           clearOutput={() => setOutput(null)}
         />
       )}
-      <Loading message='Pulling' isOpen={loading} />
+      <Loading message={loadingMsg} isOpen={!!loadingMsg} />
     </>
   );
 };

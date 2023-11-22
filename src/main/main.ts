@@ -427,35 +427,25 @@ app.whenReady().then(() => {
 
   ipcMain.on('pull-branch', async (event, path, branch) => {
     const git = simpleGit(gitOptions(path));
-    // await git.pull('origin', 'main123');
 
-    event.sender.send('process-started');
-    // mainWindow?.webContents.send('process-started');
+    event.sender.send('process-started', 'Pulling');
 
     try {
-      // event.sender.send(
-      //   'pull-branch-success',
-      //   await git.status(),
-      // );
-      // console.log(path, branch);
       console.log(`pull: ${branch}`);
-      // await git.pull();
-      await git.pull('origin', 'main123');
+      event.sender.send('pull-branch-success', await git.pull());
     } catch (err) {
       event.sender.send('pull-branch-error', (err as Error).message);
-      // console.error('failed: ', err);
     }
   });
 
   ipcMain.on('push-branch', async (event, path, branch) => {
-    // const git = simpleGit(gitOptions(path));
+    const git = simpleGit(gitOptions(path));
+
+    event.sender.send('process-started', 'Pushing');
+
     try {
-      // event.sender.send(
-      //   'push-branch-success',
-      //   await git.status(),
-      // );
-      // console.log(path, branch);
       console.log(`push: ${branch}`);
+      event.sender.send('push-branch-success', await git.push());
     } catch (err) {
       event.sender.send('push-branch-error', (err as Error).message);
     }
@@ -469,6 +459,7 @@ app.whenReady().then(() => {
       //   await git.status(),
       // );
       // console.log(path, selected, current);
+      console.log(path);
       console.log(`merge: ${selected} ${current}`);
     } catch (err) {
       event.sender.send('merge-branch-error', (err as Error).message);

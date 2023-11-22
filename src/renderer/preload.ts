@@ -52,7 +52,7 @@ export type ContextBridgeApi = {
     current: string,
   ) => Promise<string>;
   getStatus: (path: string | undefined) => Promise<StatusResult>;
-  onProcessStarted: (listener: () => void) => void;
+  onProcessStarted: (listener: (message: string) => void) => void;
 };
 
 const exposedApi: ContextBridgeApi = {
@@ -351,7 +351,7 @@ const exposedApi: ContextBridgeApi = {
   },
 
   onProcessStarted: (listener) => {
-    ipcRenderer.on('process-started', listener);
+    ipcRenderer.on('process-started', (_event, message) => listener(message));
   },
 };
 
