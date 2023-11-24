@@ -271,10 +271,16 @@ app.whenReady().then(() => {
     );
   });
 
-  ipcMain.on('checkout-branch', (event, path, branch) => {
-    checkoutBranch(path, branch).then((path) => {
-      event.sender.send('checkout-branch-success', path);
-    });
+  ipcMain.on('checkout-branch', async (event, path, branch) => {
+    try {
+      event.sender.send(
+        'checkout-branch-success',
+        await checkoutBranch(path, branch),
+      );
+    } catch (err) {
+      console.log(err);
+      event.sender.send('checkout-branch-error', (err as Error).message);
+    }
   });
 
   ipcMain.on('add-branch', async (event, path, name) => {
@@ -452,14 +458,12 @@ app.whenReady().then(() => {
   });
 
   ipcMain.on('merge-branch', async (event, path, selected, current) => {
-    // const git = simpleGit(gitOptions(path));
+    const git = simpleGit(gitOptions(path));
     try {
-      // event.sender.send(
-      //   'merge-branch-success',
-      //   await git.status(),
-      // );
-      // console.log(path, selected, current);
-      console.log(path);
+      event.sender.send(
+        'merge-branch-success',
+        await git.mergeFromTo(selected, current),
+      );
       console.log(`merge: ${selected} ${current}`);
     } catch (err) {
       event.sender.send('merge-branch-error', (err as Error).message);

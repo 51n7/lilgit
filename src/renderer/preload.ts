@@ -146,10 +146,13 @@ const exposedApi: ContextBridgeApi = {
   checkoutBranch: (path, branch) => {
     ipcRenderer.send('checkout-branch', path, branch);
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       ipcRenderer.once(
         'checkout-branch-success',
         (_event, data: BranchSummary) => resolve(data),
+      );
+      ipcRenderer.once('checkout-branch-error', (_event, error) =>
+        reject(new Error(error)),
       );
     });
   },

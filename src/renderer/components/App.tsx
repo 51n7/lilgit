@@ -145,9 +145,16 @@ const App = () => {
   }
 
   async function updateBranches(item: TransformBranch | undefined) {
-    setBranchList(
-      await window.api.checkoutBranch(currentRepo?.absolute, item?.name ?? ''),
-    );
+    try {
+      setBranchList(
+        await window.api.checkoutBranch(
+          currentRepo?.absolute,
+          item?.name ?? '',
+        ),
+      );
+    } catch (error) {
+      setOutput((error as Error).message);
+    }
   }
 
   async function addBranch(name: string) {
@@ -273,13 +280,21 @@ const App = () => {
                   <span className='text-blue'>`{status?.current}`</span>{' '}
                   tracking{' '}
                   <span className='text-blue'>`{status?.tracking}`</span>
-                  {!!status?.ahead && (
+                  {!!status?.ahead && !!status?.behind && (
+                    <p>
+                      You're <span className='text-red'>ahead</span> by{' '}
+                      {status?.ahead} and{' '}
+                      <span className='text-red'>behind</span> by{' '}
+                      {status?.behind}
+                    </p>
+                  )}
+                  {!!status?.ahead && !status?.behind && (
                     <p>
                       You're <span className='text-red'>ahead</span> by{' '}
                       {status?.ahead}
                     </p>
                   )}
-                  {!!status?.behind && (
+                  {!!status?.behind && !status?.ahead && (
                     <p>
                       You're <span className='text-red'>behind</span> by{' '}
                       {status?.behind}

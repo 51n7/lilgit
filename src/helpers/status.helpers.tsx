@@ -8,6 +8,7 @@ export function convertGitResponse(
     unstaged: [],
     untracked: [],
     staged: [],
+    'merge conflicts': [],
   };
 
   if (!response || Object.keys(response).length === 0) {
@@ -37,6 +38,8 @@ export function convertGitResponse(
       transformedResponse.untracked?.push(transformedFile);
     } else if (response.staged.includes(file.path)) {
       transformedResponse.staged?.push(transformedFile);
+    } else if (response.conflicted.includes(file.path)) {
+      transformedResponse['merge conflicts']?.push(transformedFile);
     }
   });
 
