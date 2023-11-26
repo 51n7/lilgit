@@ -10,7 +10,7 @@ const ErrorNotification: React.FC<ErrorNotificationProps> = ({
   clearError,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const modifiedErrorMessage = message.split(':').slice(1).join(':').trim();
+  // const modifiedErrorMessage = message.split(':').slice(1).join(':').trim();
 
   useEffect(() => {
     const showTimeout = setTimeout(() => {
@@ -33,7 +33,7 @@ const ErrorNotification: React.FC<ErrorNotificationProps> = ({
 
   return (
     <div className={`error-notification ${isVisible ? 'show' : ''}`}>
-      <p>{modifiedErrorMessage}</p>
+      <p>{message}</p>
     </div>
   );
 };

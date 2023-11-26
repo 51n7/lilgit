@@ -52,6 +52,7 @@ export type ContextBridgeApi = {
     current: string,
   ) => Promise<string>;
   getStatus: (path: string | undefined) => Promise<StatusResult>;
+  onProcessStarted: (listener: (message: string) => void) => void;
 };
 
 const exposedApi: ContextBridgeApi = {
@@ -145,10 +146,13 @@ const exposedApi: ContextBridgeApi = {
   checkoutBranch: (path, branch) => {
     ipcRenderer.send('checkout-branch', path, branch);
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       ipcRenderer.once(
         'checkout-branch-success',
         (_event, data: BranchSummary) => resolve(data),
+      );
+      ipcRenderer.once('checkout-branch-error', (_event, error) =>
+        reject(new Error(error)),
       );
     });
   },
@@ -347,6 +351,10 @@ const exposedApi: ContextBridgeApi = {
         resolve(data),
       );
     });
+  },
+
+  onProcessStarted: (listener) => {
+    ipcRenderer.on('process-started', (_event, message) => listener(message));
   },
 };
 

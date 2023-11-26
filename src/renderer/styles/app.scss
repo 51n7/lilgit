@@ -26,6 +26,7 @@ body {
   background-color: $bg;
   color: #dfe5ff;
   font-family: 'Menlo';
+  font-size: 15px;
 }
 
 html,
@@ -62,6 +63,10 @@ button {
   color: $blue;
 }
 
+.text-grey {
+  color: $grey;
+}
+
 .repo-container {
   display: flex;
   align-items: center;
@@ -84,6 +89,23 @@ button {
 
 header {
   margin-block-end: 1.5rem;
+
+  .row {
+    display: flex;
+
+    // &:not(:first-child) {
+    //   margin-block-start: 0.25rem;
+    // }
+
+    .title {
+      min-width: 6rem;
+      color: $grey;
+    }
+
+    .details {
+      flex: 1;
+    }
+  }
 }
 
 .view-status,
@@ -157,11 +179,34 @@ nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgb($bg, 75%);
+  background-color: rgb($bg, 60%);
 
-  fieldset {
+  fieldset,
+  .loading {
     background-color: $bg;
     min-width: 75%;
+    border: 2px solid $white;
+  }
+
+  .loading {
+    min-height: 3.5rem;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .loading:after {
+    content: '...';
+    overflow: hidden;
+    display: inline-block;
+    animation: ellipsis steps(4, end) 900ms infinite;
+    width: 0px;
+  }
+
+  @keyframes ellipsis {
+    to {
+      width: 2em;
+    }
   }
 
   legend {
@@ -180,6 +225,7 @@ nav {
   position: fixed;
   bottom: 10px;
   left: 50%;
+  z-index: 1;
   transform: translateX(-50%);
   display: flex;
 
@@ -202,7 +248,6 @@ nav {
 .error-notification {
   position: fixed;
   top: 10px;
-  // left: 10px;
   right: 10px;
   background-color: $red;
   color: #ffffff;
@@ -218,4 +263,28 @@ nav {
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+.resizable-box {
+  position: fixed;
+  width: 100%;
+  background-color: #1d2127;
+  box-shadow: inset 0px 0px 0px 2px $white;
+  bottom: 0;
+  padding: 1rem;
+}
+
+.resizable-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 8px;
+  background-color: transparent;
+  cursor: ns-resize;
+
+  // .resizing & {
+  //   background-color: $grey;
+  // }
 }

@@ -15,6 +15,7 @@ export type RepoProps = {
   onBranchPush: (name: string) => void;
   onBranchMerge: (selected: string, current: string) => void;
   removeCurrentRepo: () => void;
+  outputOpen: boolean;
 };
 
 export type TransformBranch = {
