@@ -56,9 +56,9 @@ function Output({ message, isOpen, clearOutput }: OutputNotificationProps) {
       <div className='resizable-handle' onMouseDown={startResize}>
         &nbsp;
       </div>
-      <div className='content' style={{ height: `${height}px` }}>
+      <pre className='content' style={{ height: `${height}px` }}>
         {message}
-      </div>
+      </pre>
     </div>
   );
 }

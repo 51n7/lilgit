@@ -3,7 +3,7 @@ import path from 'path';
 import os from 'os';
 import { simpleGit } from 'simple-git';
 import Store from 'electron-store'; // https://github.com/sindresorhus/electron-store
-import { RepoPathProp } from 'src/types';
+import { RepoPathProp, ExtendMergeDetail } from 'src/types';
 
 /** Handle creating/removing shortcuts on Windows when installing/uninstalling. */
 if (require('electron-squirrel-startup')) {
@@ -460,13 +460,26 @@ app.whenReady().then(() => {
   ipcMain.on('merge-branch', async (event, path, selected, current) => {
     const git = simpleGit(gitOptions(path));
     try {
-      event.sender.send(
-        'merge-branch-success',
-        await git.mergeFromTo(selected, current),
-      );
-      console.log(`merge: ${selected} ${current}`);
+      const mergeSummary = await git.mergeFromTo(selected, current);
+      event.sender.send('merge-branch-success', mergeSummary);
     } catch (err) {
-      event.sender.send('merge-branch-error', (err as Error).message);
+      const mergeError = err as ExtendMergeDetail;
+
+      if (mergeError.git !== undefined) {
+        event.sender.send(
+          'merge-branch-error',
+          JSON.stringify({
+            git: mergeError.git,
+          }),
+        );
+      } else {
+        const errorToSend = {
+          name: mergeError.name,
+          message: mergeError.message,
+          stack: mergeError.stack,
+        };
+        event.sender.send('merge-branch-error', JSON.stringify(errorToSend));
+      }
     }
   });
 

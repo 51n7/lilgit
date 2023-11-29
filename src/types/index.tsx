@@ -1,4 +1,9 @@
-import { BranchSummary } from 'simple-git';
+import {
+  BranchSummary,
+  MergeConflict,
+  MergeDetail,
+  MergeResultStatus,
+} from 'simple-git';
 
 export type RepoPathProp = {
   absolute: string;
@@ -50,4 +55,8 @@ export type GitLogEntry = {
   message: string | undefined;
   name: string | undefined;
   time: string | undefined;
+};
+
+export type ExtendMergeDetail = Error & {
+  git?: MergeDetail;
 };

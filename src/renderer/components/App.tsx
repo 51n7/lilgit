@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
-import { RepoPathProp, TransformBranch, GitLogEntry } from 'src/types';
-import { StatusResult, BranchSummary } from 'simple-git';
+import {
+  RepoPathProp,
+  TransformBranch,
+  GitLogEntry,
+  ExtendMergeDetail,
+} from 'src/types';
+import { StatusResult, BranchSummary, MergeDetail } from 'simple-git';
 import Status from './Status';
 import Branches from './Branches';
 import Graph from './Graph';
@@ -195,7 +200,19 @@ const App = () => {
     try {
       await window.api.mergeBranch(currentRepo?.absolute, selected, current);
     } catch (error) {
-      setOutput((error as Error).message);
+      const customError: ExtendMergeDetail = error as ExtendMergeDetail;
+
+      if (customError.git && customError.git?.conflicts) {
+        const conflictedFiles = customError.git?.conflicts.map(
+          (conflict) => `-- ${conflict.file}`,
+        );
+
+        const filesString = conflictedFiles.join('\n');
+
+        setOutput(`${customError.git?.result}\n${filesString}`);
+      } else {
+        setOutput(customError.message);
+      }
     }
     setLoadingMsg('');
   }

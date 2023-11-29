@@ -5,8 +5,8 @@
 // We use it in the preload instead of renderer in order to expose only
 // whitelisted wrappers to increase the security of our application.
 import { contextBridge, ipcRenderer } from 'electron';
-import { RepoPathProp, GitLogEntry } from 'src/types';
-import { BranchSummary, StatusResult } from 'simple-git';
+import { RepoPathProp, GitLogEntry, ExtendMergeDetail } from 'src/types';
+import { BranchSummary, MergeDetail, StatusResult } from 'simple-git';
 
 // Create a type that should contain all the data we need to expose in the
 // renderer process using `contextBridge`.
@@ -335,9 +335,23 @@ const exposedApi: ContextBridgeApi = {
       ipcRenderer.once('merge-branch-success', (_event, data: string) =>
         resolve(data),
       );
-      ipcRenderer.once('merge-branch-error', (_event, error) =>
-        reject(new Error(error)),
-      );
+
+      ipcRenderer.once('merge-branch-error', (_event, error) => {
+        try {
+          const parsedError = JSON.parse(error);
+
+          const customError: ExtendMergeDetail = {
+            name: parsedError.name,
+            message: parsedError.message,
+            git: parsedError.git as MergeDetail,
+          };
+
+          reject(customError);
+        } catch (parseError) {
+          console.error('Error parsing custom error:', parseError);
+          reject(new Error('Failed to parse custom error'));
+        }
+      });
     });
   },
 
