@@ -5,7 +5,7 @@ import {
   GitLogEntry,
   ExtendMergeDetail,
 } from 'src/types';
-import { StatusResult, BranchSummary, MergeDetail } from 'simple-git';
+import { StatusResult, BranchSummary } from 'simple-git';
 import Status from './Status';
 import Branches from './Branches';
 import Graph from './Graph';

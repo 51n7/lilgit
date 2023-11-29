@@ -1,9 +1,4 @@
-import {
-  BranchSummary,
-  MergeConflict,
-  MergeDetail,
-  MergeResultStatus,
-} from 'simple-git';
+import { BranchSummary, MergeDetail } from 'simple-git';
 
 export type RepoPathProp = {
   absolute: string;
