@@ -25,6 +25,12 @@ export type ContextBridgeApi = {
     branch: string,
   ) => Promise<BranchSummary>;
   addBranch: (path: string | undefined, name: string) => Promise<BranchSummary>;
+  addRemoteBranch: (
+    path: string | undefined,
+    selected: string,
+    current: string,
+  ) => Promise<BranchSummary>;
+
   deleteBranch: (
     path: string | undefined,
     name: string,
@@ -165,6 +171,20 @@ const exposedApi: ContextBridgeApi = {
         resolve(data),
       );
       ipcRenderer.once('add-branch-error', (_event, error) =>
+        reject(new Error(error)),
+      );
+    });
+  },
+
+  addRemoteBranch: (path, selected, name) => {
+    ipcRenderer.send('add-remote-branch', path, selected, name);
+
+    return new Promise((resolve, reject) => {
+      ipcRenderer.once(
+        'add-remote-branch-success',
+        (_event, data: BranchSummary) => resolve(data),
+      );
+      ipcRenderer.once('add-remote-branch-error', (_event, error) =>
         reject(new Error(error)),
       );
     });

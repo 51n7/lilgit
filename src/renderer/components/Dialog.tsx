@@ -2,23 +2,31 @@ import { useEffect, useRef, useState } from 'react';
 
 type DialogProps = {
   title: string;
+  defaultValue?: string;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onSubmit: (item: string) => void;
+  onSubmit: (name: string) => void;
 };
 
-function Dialog({ title, isOpen, setIsOpen, onSubmit }: DialogProps) {
-  const [dialogString, setDialogString] = useState<string>('');
+function Dialog({
+  title,
+  defaultValue,
+  isOpen,
+  setIsOpen,
+  onSubmit,
+}: DialogProps) {
+  const [dialogString, setDialogString] = useState<string>(defaultValue || '');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsOpen(false);
-      }
       if (event.key === 'Enter') {
+        onSubmit(dialogString || defaultValue || '');
+      }
+
+      if (event.key === 'Escape' || event.key === 'Enter') {
         setIsOpen(false);
-        onSubmit(dialogString);
+        setDialogString('');
       }
     };
 
@@ -33,7 +41,7 @@ function Dialog({ title, isOpen, setIsOpen, onSubmit }: DialogProps) {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [isOpen, onSubmit, setIsOpen, dialogString]);
+  }, [isOpen, onSubmit, setIsOpen, dialogString, defaultValue]);
 
   return (
     isOpen && (
@@ -43,7 +51,7 @@ function Dialog({ title, isOpen, setIsOpen, onSubmit }: DialogProps) {
           <input
             type='text'
             ref={inputRef}
-            defaultValue=''
+            defaultValue={defaultValue}
             onChange={(e) => {
               setDialogString(e.currentTarget.value);
             }}

@@ -9,7 +9,8 @@ export type RepoProps = {
   currentRepo?: string;
   branches?: BranchSummary;
   onBranchCheckout?: (item: TransformBranch | undefined) => void;
-  onBranchNew: (name: string) => void;
+  onLocalNew: (name: string) => void;
+  onRemoteNew: (selected: string, name: string) => void;
   onBranchDelete: (name: string) => void;
   onBranchPull: (name: string) => void;
   onBranchPush: (name: string) => void;
@@ -24,6 +25,7 @@ export type TransformBranch = {
   name: string;
   commit: string;
   label: string;
+  remote: string;
 };
 
 export type TransformBranches = {

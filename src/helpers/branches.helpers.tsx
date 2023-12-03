@@ -12,29 +12,33 @@ export function transformBranch(input: BranchSummary): TransformBranches {
     branchData: BranchSummaryBranch,
     id: number,
   ): TransformBranch => {
+    const { current, name, commit, label } = branchData;
     return {
       id,
-      current: branchData.current,
-      name: branchData.name,
-      commit: branchData.commit,
-      label: branchData.label,
+      current,
+      name,
+      commit,
+      label,
+      remote: '',
     };
   };
 
-  // Extract other branches' details and group by remote
+  // Extract other branches details and group by remote
   for (const branchName of all) {
     const branch = branches[branchName];
     if (branch) {
       if (!branchName.startsWith('remotes/')) {
         localBranches.push(mapBranch(branch, nextId));
       } else {
-        const remoteName = branchName.substring(8, branchName.indexOf('/', 9));
+        const remote = branchName.split('/'); // ["remotes", "origin", "main"]
+        const remoteName = remote[1];
         const remoteBranch = mapBranch(branch, nextId);
 
         if (!remoteBranches[remoteName]) {
           remoteBranches[remoteName] = [];
         }
 
+        remoteBranch.name = remote.slice(1).join('/');
         remoteBranches[remoteName].push(remoteBranch);
       }
       nextId++;
@@ -64,8 +68,10 @@ export function findBranchById(
   }
 
   // Flatten the arrays while handling the optional nature of "local" array and remote arrays
-  const allArrays = ([] as TransformBranch[]).concat(
-    ...Object.values(data).filter(Array.isArray),
+  const allArrays: TransformBranch[] = ([] as TransformBranch[]).concat(
+    ...Object.keys(data).flatMap((key) =>
+      (data[key] || []).map((branch) => ({ ...branch, remote: key })),
+    ),
   );
 
   // Find the object with the specified id

@@ -11,7 +11,8 @@ import Dialog from './Dialog';
 function Branches({
   branches,
   onBranchCheckout,
-  onBranchNew,
+  onLocalNew,
+  onRemoteNew,
   onBranchDelete,
   onBranchPull,
   onBranchPush,
@@ -20,8 +21,14 @@ function Branches({
   outputOpen,
 }: RepoProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [selectedBranch, setSelectedBranch] = useState<
+    TransformBranch | undefined
+  >();
   const [showMenu, setShowMenu] = useState<boolean>(false);
-  const [newBranchDialog, setNewBranchDialog] = useState<boolean>(false);
+  const [newLocalBranchDialog, setNewLocalBranchDialog] =
+    useState<boolean>(false);
+  const [newRemoteBranchDialog, setNewRemoteBranchDialog] =
+    useState<boolean>(false);
   const transformBranches = branches ? transformBranch(branches) : null;
   const branchesLength = branches
     ? Object.keys(branches.branches).length
@@ -32,25 +39,14 @@ function Branches({
     setSelectedIndex(item.id);
   };
 
-  // const handleNewBranchDialog = (name: string) => {
-  //   onBranchNew(name);
-  // };
-
   const keyMap = useMemo(
     () => [
       {
         key: 'c',
         description: 'checkout',
         function: () => {
-          if (selectedIndex !== null) {
-            const selectedBranch = findBranchById(
-              transformBranches,
-              selectedIndex,
-            );
-
-            if (onBranchCheckout) {
-              onBranchCheckout(selectedBranch);
-            }
+          if (onBranchCheckout && selectedIndex !== null) {
+            onBranchCheckout(selectedBranch);
           }
         },
       },
@@ -59,7 +55,11 @@ function Branches({
         description: 'create from selected branch',
         function: () => {
           if (selectedIndex !== null) {
-            setNewBranchDialog((showDialog) => !showDialog);
+            if (selectedBranch?.remote === 'local') {
+              setNewLocalBranchDialog((showDialog) => !showDialog);
+            } else {
+              setNewRemoteBranchDialog((showDialog) => !showDialog);
+            }
           }
         },
       },
@@ -68,11 +68,6 @@ function Branches({
         description: 'delete',
         function: () => {
           if (selectedIndex !== null) {
-            const selectedBranch = findBranchById(
-              transformBranches,
-              selectedIndex,
-            );
-
             if (onBranchCheckout) {
               onBranchDelete(selectedBranch?.name ?? '');
             }
@@ -84,11 +79,6 @@ function Branches({
         description: 'pull selected branch',
         function: () => {
           if (selectedIndex !== null) {
-            const selectedBranch = findBranchById(
-              transformBranches,
-              selectedIndex,
-            );
-
             onBranchPull(selectedBranch?.name ?? '');
           }
         },
@@ -98,11 +88,6 @@ function Branches({
         description: 'push selected to remote',
         function: () => {
           if (selectedIndex !== null) {
-            const selectedBranch = findBranchById(
-              transformBranches,
-              selectedIndex,
-            );
-
             onBranchPush(selectedBranch?.name ?? '');
           }
         },
@@ -119,11 +104,6 @@ function Branches({
         description: 'merge selected into active branch',
         function: () => {
           if (selectedIndex !== null) {
-            const selectedBranch = findBranchById(
-              transformBranches,
-              selectedIndex,
-            );
-
             onBranchMerge(selectedBranch?.name ?? '', branches?.current ?? '');
           }
         },
@@ -131,7 +111,7 @@ function Branches({
       {
         key: 'Escape',
         function: () => {
-          if (!showMenu && !outputOpen && !newBranchDialog) {
+          if (!showMenu && !outputOpen && !newLocalBranchDialog) {
             setSelectedIndex(null);
             removeCurrentRepo();
           }
@@ -139,18 +119,18 @@ function Branches({
       },
     ],
     [
-      selectedIndex,
-      transformBranches,
       onBranchCheckout,
+      selectedIndex,
+      selectedBranch,
       onBranchDelete,
       onBranchPull,
       onBranchPush,
       onBranchMerge,
       branches,
       showMenu,
-      newBranchDialog,
-      removeCurrentRepo,
       outputOpen,
+      newLocalBranchDialog,
+      removeCurrentRepo,
     ],
   );
 
@@ -166,27 +146,33 @@ function Branches({
       if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
         event.preventDefault();
         setSelectedIndex((prevIndex) => {
+          let newIndex;
           if (prevIndex === null || prevIndex === 0) {
-            return branchLength - 1;
+            newIndex = branchLength - 1;
           } else {
-            return prevIndex - 1;
+            newIndex = prevIndex - 1;
           }
+          setSelectedBranch(findBranchById(transformBranches, newIndex));
+          return newIndex;
         });
       } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
         event.preventDefault();
         setSelectedIndex((prevIndex) => {
+          let newIndex;
           if (prevIndex === null || prevIndex === branchLength - 1) {
-            return 0;
+            newIndex = 0;
           } else {
-            return prevIndex + 1;
+            newIndex = prevIndex + 1;
           }
+          setSelectedBranch(findBranchById(transformBranches, newIndex));
+          return newIndex;
         });
       } else if (event.shiftKey && event.code == 'Slash') {
         setShowMenu((showMenu) => !showMenu);
       }
     };
 
-    if (!showMenu && !newBranchDialog) {
+    if (!showMenu && !newLocalBranchDialog && !newRemoteBranchDialog) {
       window.addEventListener('keydown', handleKeyPress);
       return () => {
         window.removeEventListener('keydown', handleKeyPress);
@@ -199,7 +185,8 @@ function Branches({
     branchesLength,
     onBranchCheckout,
     showMenu,
-    newBranchDialog,
+    newLocalBranchDialog,
+    newRemoteBranchDialog,
   ]);
 
   return (
@@ -221,10 +208,19 @@ function Branches({
       <Menu options={keyMap} isOpen={showMenu} setIsOpen={setShowMenu} />
       <Dialog
         title='New branch'
-        isOpen={newBranchDialog}
-        setIsOpen={setNewBranchDialog}
+        isOpen={newLocalBranchDialog}
+        setIsOpen={setNewLocalBranchDialog}
         onSubmit={(name) => {
-          onBranchNew(name);
+          onLocalNew(name);
+        }}
+      />
+      <Dialog
+        title='New branch'
+        defaultValue={selectedBranch?.name.split('/').pop()}
+        isOpen={newRemoteBranchDialog}
+        setIsOpen={setNewRemoteBranchDialog}
+        onSubmit={(name) => {
+          onRemoteNew(selectedBranch?.name || '', name);
         }}
       />
     </div>

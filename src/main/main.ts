@@ -142,6 +142,18 @@ async function checkoutBranch(path: string, branch: string) {
   }
 }
 
+async function checkoutRemoteBranch(
+  path: string,
+  selected: string,
+  name: string,
+) {
+  if (path) {
+    const git = simpleGit(gitOptions(path));
+    await git.checkoutBranch(name, selected);
+    return await git.branch();
+  }
+}
+
 async function addBranch(path: string, name: string) {
   if (path) {
     const git = simpleGit(gitOptions(path));
@@ -288,6 +300,17 @@ app.whenReady().then(() => {
       event.sender.send('add-branch-success', await addBranch(path, name));
     } catch (err) {
       event.sender.send('add-branch-error', (err as Error).message);
+    }
+  });
+
+  ipcMain.on('add-remote-branch', async (event, path, selected, name) => {
+    try {
+      event.sender.send(
+        'add-remote-branch-success',
+        await checkoutRemoteBranch(path, selected, name),
+      );
+    } catch (err) {
+      event.sender.send('add-remote-branch-error', (err as Error).message);
     }
   });
 
@@ -438,6 +461,10 @@ app.whenReady().then(() => {
 
     try {
       console.log(`pull: ${branch}`);
+      // event.sender.send(
+      //   'pull-branch-success',
+      //   await git.pull('origin/main', 'main'),
+      // );
       event.sender.send('pull-branch-success', await git.pull());
     } catch (err) {
       event.sender.send('pull-branch-error', (err as Error).message);

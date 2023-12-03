@@ -43,7 +43,8 @@ const App = () => {
     <Branches
       branches={branchList}
       onBranchCheckout={updateBranches}
-      onBranchNew={addBranch}
+      onLocalNew={addLocalBranch}
+      onRemoteNew={addRemoteBranch}
       onBranchDelete={deleteBranch}
       onBranchPull={pullBranch}
       onBranchPush={pushBranch}
@@ -162,9 +163,19 @@ const App = () => {
     }
   }
 
-  async function addBranch(name: string) {
+  async function addLocalBranch(name: string) {
     try {
       setBranchList(await window.api.addBranch(currentRepo?.absolute, name));
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  }
+
+  async function addRemoteBranch(selected: string, name: string) {
+    try {
+      setBranchList(
+        await window.api.addRemoteBranch(currentRepo?.absolute, selected, name),
+      );
     } catch (error) {
       setError((error as Error).message);
     }
