@@ -23,7 +23,7 @@ function BranchesList({ items, onItemClick, selectedIndex }: BranchListProps) {
                 backgroundColor: selectedIndex === item.id ? '#2f7351' : '',
               }}
             >
-              {item.name}
+              {`${item.commit} ${item.name}`}
             </span>
           </li>
         ))}

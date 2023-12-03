@@ -38,7 +38,7 @@ export function transformBranch(input: BranchSummary): TransformBranches {
           remoteBranches[remoteName] = [];
         }
 
-        remoteBranch.name = remote.slice(1).join('/');
+        remoteBranch.name = remote.pop() || '';
         remoteBranches[remoteName].push(remoteBranch);
       }
       nextId++;

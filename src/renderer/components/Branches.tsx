@@ -220,7 +220,10 @@ function Branches({
         isOpen={newRemoteBranchDialog}
         setIsOpen={setNewRemoteBranchDialog}
         onSubmit={(name) => {
-          onRemoteNew(selectedBranch?.name || '', name);
+          onRemoteNew(
+            `${selectedBranch?.remote}/${selectedBranch?.name}`,
+            name,
+          );
         }}
       />
     </div>
