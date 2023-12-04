@@ -59,6 +59,7 @@ export type ContextBridgeApi = {
   ) => Promise<string>;
   getStatus: (path: string | undefined) => Promise<StatusResult>;
   onProcessStarted: (listener: (message: string) => void) => void;
+  onDirectoryChanged: (listener: (status: StatusResult) => void) => void;
 };
 
 const exposedApi: ContextBridgeApi = {
@@ -389,6 +390,12 @@ const exposedApi: ContextBridgeApi = {
 
   onProcessStarted: (listener) => {
     ipcRenderer.on('process-started', (_event, message) => listener(message));
+  },
+
+  onDirectoryChanged: (listener) => {
+    ipcRenderer.on('directory-changed', (_event, status: StatusResult) =>
+      listener(status),
+    );
   },
 };
 

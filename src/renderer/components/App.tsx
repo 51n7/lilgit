@@ -242,13 +242,17 @@ const App = () => {
       setLoadingMsg(message);
     });
 
+    window.api.onDirectoryChanged((status: StatusResult) => {
+      setStatus(status);
+    });
+
     const fetchRepos = async () => {
       try {
         const repo = await window.api.getCurrent();
         setCurrentRepo(await window.api.getCurrent());
         setRepoList(await window.api.getRepos());
         setBranchList(await window.api.getBranches(repo?.absolute));
-        setStatus(await window.api.getStatus(repo?.absolute));
+        // setStatus(await window.api.getStatus(repo?.absolute));
         setGraphList(await window.api.getLog(repo?.absolute));
       } catch (error) {
         console.error('Error fetching:', error);
@@ -280,11 +284,18 @@ const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       setBranchList(await window.api.getBranches(currentRepo?.absolute));
-      setStatus(await window.api.getStatus(currentRepo?.absolute));
+      // setStatus(await window.api.getStatus(currentRepo?.absolute));
       setGraphList(await window.api.getLog(currentRepo?.absolute));
     };
     fetchData().catch(console.error);
   }, [currentRepo]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setStatus(await window.api.getStatus(currentRepo?.absolute));
+    };
+    fetchData().catch(console.error);
+  }, [branchList, currentRepo?.absolute]);
 
   return (
     <>

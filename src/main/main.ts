@@ -3,6 +3,7 @@ import path from 'path';
 import os from 'os';
 import { simpleGit } from 'simple-git';
 import Store from 'electron-store'; // https://github.com/sindresorhus/electron-store
+import chokidar from 'chokidar'; // https://github.com/paulmillr/chokidar
 import { RepoPathProp, ExtendMergeDetail } from 'src/types';
 
 /** Handle creating/removing shortcuts on Windows when installing/uninstalling. */
@@ -207,6 +208,7 @@ async function selectFolder(
 // Wait for Electron app to be ready before registering IPC listeners.
 app.whenReady().then(() => {
   const store = new Store();
+  let currentWatcher: chokidar.FSWatcher | null = null;
 
   if (!store.get('repos')) {
     store.set('repos', []);
@@ -218,8 +220,28 @@ app.whenReady().then(() => {
     event.sender.send('get-current-success', store.get('current-repo'));
   });
 
-  ipcMain.on('set-current', (_event, path) => {
+  ipcMain.on('set-current', (event, path) => {
+    const sender = event.sender;
+    const absolute = path.absolute;
     store.set('current-repo', path);
+
+    if (currentWatcher) {
+      currentWatcher.close();
+      currentWatcher = null;
+    }
+
+    currentWatcher = chokidar.watch(absolute, {
+      persistent: true,
+      ignoreInitial: true,
+    });
+
+    currentWatcher.on('all', async () => {
+      getStatus(absolute).then((absolute) => {
+        const cleanResponse = { ...absolute };
+        delete cleanResponse.isClean;
+        sender.send('directory-changed', cleanResponse);
+      });
+    });
   });
 
   ipcMain.on('remove-current', () => {
