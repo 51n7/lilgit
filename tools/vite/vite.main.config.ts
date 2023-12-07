@@ -6,7 +6,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   build: {
     rollupOptions: {
-      external: [], // Provide native modules as externals for eg (serialport, sqlite3)
+      external: ["fsevents"], // Provide native modules as externals for eg (serialport, sqlite3)
     },
   },
 });
