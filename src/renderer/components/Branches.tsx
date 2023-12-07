@@ -35,8 +35,8 @@ function Branches({
     : null;
 
   const handleItemClick = (item: TransformBranch) => {
-    console.log('Selected item:', item.name);
     setSelectedIndex(item.id);
+    setSelectedBranch(findBranchById(transformBranches, item.id));
   };
 
   const keyMap = useMemo(
@@ -216,7 +216,7 @@ function Branches({
       />
       <Dialog
         title='New branch'
-        defaultValue={selectedBranch?.name.split('/').pop()}
+        defaultValue={selectedBranch?.name}
         isOpen={newRemoteBranchDialog}
         setIsOpen={setNewRemoteBranchDialog}
         onSubmit={(name) => {

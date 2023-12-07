@@ -242,9 +242,12 @@ const App = () => {
       setLoadingMsg(message);
     });
 
-    window.api.onDirectoryChanged((status: StatusResult) => {
-      setStatus(status);
-    });
+    window.api.onDirectoryChanged(
+      (status: StatusResult, branches: BranchSummary) => {
+        setStatus(status);
+        setBranchList(branches);
+      },
+    );
 
     const fetchRepos = async () => {
       try {

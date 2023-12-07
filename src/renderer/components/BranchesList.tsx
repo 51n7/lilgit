@@ -22,6 +22,7 @@ function BranchesList({ items, onItemClick, selectedIndex }: BranchListProps) {
                 cursor: 'pointer',
                 backgroundColor: selectedIndex === item.id ? '#2f7351' : '',
               }}
+              title={item.name}
             >
               {`${item.commit} ${item.name}`}
             </span>

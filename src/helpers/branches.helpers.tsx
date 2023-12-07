@@ -30,7 +30,10 @@ export function transformBranch(input: BranchSummary): TransformBranches {
       if (!branchName.startsWith('remotes/')) {
         localBranches.push(mapBranch(branch, nextId));
       } else {
-        const remote = branchName.split('/'); // ["remotes", "origin", "main"]
+        const branchSlice = branchName.split('/'); // ["remotes", "origin", "main"]
+        const remote = branchSlice
+          .slice(0, 2)
+          .concat(branchSlice.slice(2).join('/'));
         const remoteName = remote[1];
         const remoteBranch = mapBranch(branch, nextId);
 

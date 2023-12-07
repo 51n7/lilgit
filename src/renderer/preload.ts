@@ -59,7 +59,9 @@ export type ContextBridgeApi = {
   ) => Promise<string>;
   getStatus: (path: string | undefined) => Promise<StatusResult>;
   onProcessStarted: (listener: (message: string) => void) => void;
-  onDirectoryChanged: (listener: (status: StatusResult) => void) => void;
+  onDirectoryChanged: (
+    listener: (status: StatusResult, branches: BranchSummary) => void,
+  ) => void;
 };
 
 const exposedApi: ContextBridgeApi = {
@@ -393,8 +395,10 @@ const exposedApi: ContextBridgeApi = {
   },
 
   onDirectoryChanged: (listener) => {
-    ipcRenderer.on('directory-changed', (_event, status: StatusResult) =>
-      listener(status),
+    ipcRenderer.on(
+      'directory-changed',
+      (_event, status: StatusResult, branches: BranchSummary) =>
+        listener(status, branches),
     );
   },
 };

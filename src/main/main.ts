@@ -208,7 +208,21 @@ async function selectFolder(
 // Wait for Electron app to be ready before registering IPC listeners.
 app.whenReady().then(() => {
   const store = new Store();
+  store.set('current-repo', '');
+
   let currentWatcher: chokidar.FSWatcher | null = null;
+  let debounceTimeout: NodeJS.Timeout | null = null;
+
+  function debounce(callback: () => void, delay: number) {
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    debounceTimeout = setTimeout(() => {
+      callback();
+      debounceTimeout = null;
+    }, delay);
+  }
 
   if (!store.get('repos')) {
     store.set('repos', []);
@@ -223,6 +237,7 @@ app.whenReady().then(() => {
   ipcMain.on('set-current', (event, path) => {
     const sender = event.sender;
     const absolute = path.absolute;
+    const git = simpleGit(gitOptions(absolute));
     store.set('current-repo', path);
 
     if (currentWatcher) {
@@ -235,12 +250,15 @@ app.whenReady().then(() => {
       ignoreInitial: true,
     });
 
-    currentWatcher.on('all', async () => {
-      getStatus(absolute).then((absolute) => {
-        const cleanResponse = { ...absolute };
-        delete cleanResponse.isClean;
-        sender.send('directory-changed', cleanResponse);
-      });
+    currentWatcher.on('all', () => {
+      // currentWatcher props (event, watchedPath)
+      debounce(async () => {
+        sender.send(
+          'directory-changed',
+          JSON.parse(JSON.stringify(await git.status())),
+          JSON.parse(JSON.stringify(await git.branch())),
+        );
+      }, 500);
     });
   });
 
