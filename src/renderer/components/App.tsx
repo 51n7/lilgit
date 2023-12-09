@@ -48,6 +48,7 @@ const App = () => {
       onBranchDelete={deleteBranch}
       onBranchPull={pullBranch}
       onBranchPush={pushBranch}
+      onFetch={fetch}
       onBranchMerge={mergeBranch}
       removeCurrentRepo={removeCurrentRepo}
       outputOpen={!!output}
@@ -207,6 +208,15 @@ const App = () => {
     setLoadingMsg('');
   }
 
+  async function fetch() {
+    try {
+      await window.api.fetch(currentRepo?.absolute);
+    } catch (error) {
+      setOutput((error as Error).message);
+    }
+    setLoadingMsg('');
+  }
+
   async function mergeBranch(selected: string, current: string) {
     try {
       await window.api.mergeBranch(currentRepo?.absolute, selected, current);
@@ -302,6 +312,7 @@ const App = () => {
 
   return (
     <>
+      <div className='drag'></div>
       {currentRepo && (
         <div className='pad'>
           <div className='dot-nav' data-view={viewState + 1}>

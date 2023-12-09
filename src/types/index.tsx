@@ -14,6 +14,7 @@ export type RepoProps = {
   onBranchDelete: (name: string) => void;
   onBranchPull: (name: string) => void;
   onBranchPush: (name: string) => void;
+  onFetch: () => void;
   onBranchMerge: (selected: string, current: string) => void;
   removeCurrentRepo: () => void;
   outputOpen: boolean;

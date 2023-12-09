@@ -16,6 +16,7 @@ function Branches({
   onBranchDelete,
   onBranchPull,
   onBranchPush,
+  onFetch,
   onBranchMerge,
   removeCurrentRepo,
   outputOpen,
@@ -96,7 +97,7 @@ function Branches({
         key: 'f',
         description: 'fetch remote branches',
         function: () => {
-          console.log('fetch');
+          onFetch();
         },
       },
       {
@@ -125,6 +126,7 @@ function Branches({
       onBranchDelete,
       onBranchPull,
       onBranchPush,
+      onFetch,
       onBranchMerge,
       branches,
       showMenu,

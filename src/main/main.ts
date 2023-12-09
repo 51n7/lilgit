@@ -524,6 +524,18 @@ app.whenReady().then(() => {
     }
   });
 
+  ipcMain.on('fetch', async (event, path) => {
+    const git = simpleGit(gitOptions(path));
+
+    event.sender.send('process-started', 'Fetching');
+
+    try {
+      event.sender.send('fetch-branch-success', await git.fetch());
+    } catch (err) {
+      event.sender.send('fetch-branch-error', (err as Error).message);
+    }
+  });
+
   ipcMain.on('merge-branch', async (event, path, selected, current) => {
     const git = simpleGit(gitOptions(path));
     try {
