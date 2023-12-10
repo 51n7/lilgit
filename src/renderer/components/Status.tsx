@@ -234,6 +234,7 @@ function Status({
       )}
 
       <Menu options={keyMap} isOpen={showMenu} setIsOpen={setShowMenu} />
+
       <Dialog
         title='Commit Message'
         isOpen={showCommitDialog}

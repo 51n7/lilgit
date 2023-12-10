@@ -199,9 +199,9 @@ const App = () => {
     setLoadingMsg('');
   }
 
-  async function pushBranch(branch: string) {
+  async function pushBranch(branch: string, remote: string | undefined) {
     try {
-      await window.api.pushBranch(currentRepo?.absolute, branch);
+      await window.api.pushBranch(currentRepo?.absolute, branch, remote);
     } catch (error) {
       setOutput((error as Error).message);
     }

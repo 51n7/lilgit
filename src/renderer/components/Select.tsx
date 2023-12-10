@@ -1,41 +1,36 @@
 import { useEffect, useState } from 'react';
 
-type KeyMapItem = {
-  key: string;
-  description?: string;
-  function: () => void;
-};
-
-type MenuProps = {
-  options: KeyMapItem[];
+type SelectProps = {
+  title: string;
+  options: string[];
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onSelect: (name: string) => void;
 };
 
-function Menu({ options, isOpen, setIsOpen }: MenuProps) {
-  const [menuIndex, setMenuIndex] = useState<number>(0);
-  const objectsWithDescription = options.filter((item) => item.description);
+function Select({ title, options, isOpen, setIsOpen, onSelect }: SelectProps) {
+  const [selectIndex, setSelectIndex] = useState<number>(0);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      const menuLength = objectsWithDescription.length;
+      const menuLength = options.length;
 
       if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
         event.preventDefault();
-        setMenuIndex((prevIndex) => {
+        setSelectIndex((prevIndex) => {
           return prevIndex === null || prevIndex === 0
             ? menuLength - 1
             : prevIndex - 1;
         });
       } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
         event.preventDefault();
-        setMenuIndex((prevIndex) => {
+        setSelectIndex((prevIndex) => {
           return prevIndex === null || prevIndex === menuLength - 1
             ? 0
             : prevIndex + 1;
         });
       } else if (event.key === 'Enter') {
-        objectsWithDescription[menuIndex].function();
+        onSelect(options[selectIndex]);
         setIsOpen(false);
       } else if (event.key === 'Escape') {
         setIsOpen(false);
@@ -49,24 +44,24 @@ function Menu({ options, isOpen, setIsOpen }: MenuProps) {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [objectsWithDescription, menuIndex, isOpen, setIsOpen]);
+  }, [options, selectIndex, isOpen, setIsOpen, onSelect]);
 
   return (
     isOpen && (
       <nav>
         <fieldset className='menu'>
-          <legend>Menu</legend>
-          {objectsWithDescription.map((item, index) => (
+          <legend>{title}</legend>
+
+          {options.map((option, index) => (
             <div
-              key={item.key}
-              onClick={() => setMenuIndex(index)}
+              key={index}
+              onClick={() => setSelectIndex(index)}
               style={{
-                cursor: 'pointer',
                 backgroundColor:
-                  menuIndex === index ? '#2f7351' : 'transparent',
+                  selectIndex === index ? '#2f7351' : 'transparent',
               }}
             >
-              {item.key} {item.description}
+              {option}
             </div>
           ))}
         </fieldset>
@@ -75,4 +70,4 @@ function Menu({ options, isOpen, setIsOpen }: MenuProps) {
   );
 }
 
-export default Menu;
+export default Select;

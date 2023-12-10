@@ -511,14 +511,20 @@ app.whenReady().then(() => {
     }
   });
 
-  ipcMain.on('push-branch', async (event, path, branch) => {
+  ipcMain.on('push-branch', async (event, path, branch, remote) => {
     const git = simpleGit(gitOptions(path));
 
     event.sender.send('process-started', 'Pushing');
 
     try {
-      console.log(`push: ${branch}`);
-      event.sender.send('push-branch-success', await git.push());
+      if (remote) {
+        event.sender.send(
+          'push-branch-success',
+          await git.push(['--set-upstream', remote, branch]),
+        );
+      } else {
+        event.sender.send('push-branch-error', 'No remotes found.');
+      }
     } catch (err) {
       event.sender.send('push-branch-error', (err as Error).message);
     }

@@ -6,6 +6,7 @@ import {
   transformBranch,
 } from '../../../src/helpers/branches.helpers';
 import Menu from './Menu';
+import Select from './Select';
 import Dialog from './Dialog';
 
 function Branches({
@@ -26,6 +27,8 @@ function Branches({
     TransformBranch | undefined
   >();
   const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [showSelect, setShowSelect] = useState<boolean>(false);
+
   const [newLocalBranchDialog, setNewLocalBranchDialog] =
     useState<boolean>(false);
   const [newRemoteBranchDialog, setNewRemoteBranchDialog] =
@@ -34,6 +37,13 @@ function Branches({
   const branchesLength = branches
     ? Object.keys(branches.branches).length
     : null;
+  const remoteList = Object.keys(transformBranches || {}).filter(
+    (key) => key !== 'local',
+  );
+
+  // const remoteList = ['origin', 'test'];
+  // const remoteList = ['origin'];
+  // const remoteList: string[] = [];
 
   const handleItemClick = (item: TransformBranch) => {
     setSelectedIndex(item.id);
@@ -89,7 +99,16 @@ function Branches({
         description: 'push selected to remote',
         function: () => {
           if (selectedIndex !== null) {
-            onBranchPush(selectedBranch?.name ?? '');
+            const name = selectedBranch?.name ?? '';
+            if (remoteList.length) {
+              if (remoteList.length > 1) {
+                setShowSelect((showSelect) => !showSelect);
+              } else {
+                onBranchPush(name, remoteList[0]);
+              }
+            } else {
+              onBranchPush(name, undefined);
+            }
           }
         },
       },
@@ -125,6 +144,7 @@ function Branches({
       selectedBranch,
       onBranchDelete,
       onBranchPull,
+      remoteList,
       onBranchPush,
       onFetch,
       onBranchMerge,
@@ -174,7 +194,12 @@ function Branches({
       }
     };
 
-    if (!showMenu && !newLocalBranchDialog && !newRemoteBranchDialog) {
+    if (
+      !showMenu &&
+      !showSelect &&
+      !newLocalBranchDialog &&
+      !newRemoteBranchDialog
+    ) {
       window.addEventListener('keydown', handleKeyPress);
       return () => {
         window.removeEventListener('keydown', handleKeyPress);
@@ -189,6 +214,7 @@ function Branches({
     showMenu,
     newLocalBranchDialog,
     newRemoteBranchDialog,
+    showSelect,
   ]);
 
   return (
@@ -226,6 +252,16 @@ function Branches({
             `${selectedBranch?.remote}/${selectedBranch?.name}`,
             name,
           );
+        }}
+      />
+
+      <Select
+        title='Select Remote'
+        options={remoteList}
+        isOpen={showSelect}
+        setIsOpen={setShowSelect}
+        onSelect={(name) => {
+          onBranchPush(selectedBranch?.name ?? '', name);
         }}
       />
     </div>

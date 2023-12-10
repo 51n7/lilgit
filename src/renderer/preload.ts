@@ -51,7 +51,11 @@ export type ContextBridgeApi = {
     message: string,
   ) => Promise<StatusResult>;
   pullBranch: (path: string | undefined, branch: string) => Promise<string>;
-  pushBranch: (path: string | undefined, branch: string) => Promise<string>;
+  pushBranch: (
+    path: string | undefined,
+    branch: string,
+    remote: string | undefined,
+  ) => Promise<string>;
   fetch: (path: string | undefined) => Promise<string>;
   mergeBranch: (
     path: string | undefined,
@@ -339,8 +343,8 @@ const exposedApi: ContextBridgeApi = {
     });
   },
 
-  pushBranch: (path, branch) => {
-    ipcRenderer.send('push-branch', path, branch);
+  pushBranch: (path, branch, remote) => {
+    ipcRenderer.send('push-branch', path, branch, remote);
 
     return new Promise((resolve, reject) => {
       ipcRenderer.once('push-branch-success', (_event, data: string) =>
