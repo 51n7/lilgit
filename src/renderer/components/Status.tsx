@@ -8,6 +8,7 @@ import StatusList from './StatusList';
 import { GitItem } from 'src/types';
 import Menu from './Menu';
 import Dialog from './Dialog';
+import Select from './Select';
 
 export type StatusProps = {
   status: StatusResult | undefined;
@@ -42,6 +43,8 @@ function Status({
   const totalModified = Object.values(transformStatus).flat().length;
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [confirmFileDiscard, setConfirmFileDiscard] = useState<boolean>(false);
+  const [confirmDiscard, setConfirmDiscard] = useState<boolean>(false);
   const [showCommitUnstagedDialog, setShowCommitUnstagedDialog] =
     useState<boolean>(false);
   const [showCommitDialog, setShowCommitDialog] = useState<boolean>(false);
@@ -49,10 +52,6 @@ function Status({
   const handleItemClick = (item: GitItem) => {
     setSelectedIndex(item.id ?? 0);
   };
-
-  // const handleCommitDialog = (item: string) => {
-  //   console.log('commit: ', item);
-  // };
 
   const keyMap = useMemo(
     () => [
@@ -121,16 +120,18 @@ function Status({
         description: 'discard changes to file',
         function: () => {
           if (selectedIndex !== null) {
-            onFileDiscard(
-              findFileById(transformStatus, selectedIndex)?.path ?? '',
-            );
+            setConfirmFileDiscard((confirmFileDiscard) => !confirmFileDiscard);
           }
         },
       },
       {
         key: 'D',
         description: 'discard all unstaged changes',
-        function: onDiscard,
+        function: () => {
+          if (selectedIndex !== null) {
+            setConfirmDiscard((confirmDiscard) => !confirmDiscard);
+          }
+        },
       },
       {
         key: 'Escape',
@@ -155,8 +156,6 @@ function Status({
       onFileStage,
       transformStatus,
       onFileUnstage,
-      onFileDiscard,
-      onDiscard,
       stageAll,
       stageAllUntracked,
       unstageAll,
@@ -198,7 +197,13 @@ function Status({
       }
     };
 
-    if (!showMenu && !showCommitUnstagedDialog && !showCommitDialog) {
+    if (
+      !showMenu &&
+      !confirmFileDiscard &&
+      !confirmDiscard &&
+      !showCommitUnstagedDialog &&
+      !showCommitDialog
+    ) {
       window.addEventListener('keydown', handleKeyPress);
       return () => {
         window.removeEventListener('keydown', handleKeyPress);
@@ -212,6 +217,8 @@ function Status({
     showMenu,
     showCommitDialog,
     showCommitUnstagedDialog,
+    confirmFileDiscard,
+    confirmDiscard,
   ]);
 
   return (
@@ -249,6 +256,32 @@ function Status({
         setIsOpen={setShowCommitUnstagedDialog}
         onSubmit={(message) => {
           commitUnstaged(message);
+        }}
+      />
+
+      <Select
+        title='Are you sure?'
+        options={['no', 'yes']}
+        isOpen={confirmFileDiscard}
+        setIsOpen={setConfirmFileDiscard}
+        onSelect={(result) => {
+          if (result == 'yes' && selectedIndex !== null) {
+            onFileDiscard(
+              findFileById(transformStatus, selectedIndex)?.path ?? '',
+            );
+          }
+        }}
+      />
+
+      <Select
+        title='Are you sure?'
+        options={['no', 'yes']}
+        isOpen={confirmDiscard}
+        setIsOpen={setConfirmDiscard}
+        onSelect={(result) => {
+          if (result == 'yes' && selectedIndex !== null) {
+            onDiscard();
+          }
         }}
       />
     </div>

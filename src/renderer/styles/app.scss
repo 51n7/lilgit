@@ -191,6 +191,10 @@ nav {
     background-color: $bg;
     min-width: 75%;
     border: 2px solid $white;
+
+    &.short {
+      min-width: 40%;
+    }
   }
 
   .loading {

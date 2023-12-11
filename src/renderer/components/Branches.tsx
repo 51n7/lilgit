@@ -28,6 +28,7 @@ function Branches({
   >();
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showSelect, setShowSelect] = useState<boolean>(false);
+  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
   const [newLocalBranchDialog, setNewLocalBranchDialog] =
     useState<boolean>(false);
@@ -40,10 +41,6 @@ function Branches({
   const remoteList = Object.keys(transformBranches || {}).filter(
     (key) => key !== 'local',
   );
-
-  // const remoteList = ['origin', 'test'];
-  // const remoteList = ['origin'];
-  // const remoteList: string[] = [];
 
   const handleItemClick = (item: TransformBranch) => {
     setSelectedIndex(item.id);
@@ -79,9 +76,7 @@ function Branches({
         description: 'delete',
         function: () => {
           if (selectedIndex !== null) {
-            if (onBranchCheckout) {
-              onBranchDelete(selectedBranch?.name ?? '');
-            }
+            setConfirmDelete((confirmDelete) => !confirmDelete);
           }
         },
       },
@@ -142,7 +137,6 @@ function Branches({
       onBranchCheckout,
       selectedIndex,
       selectedBranch,
-      onBranchDelete,
       onBranchPull,
       remoteList,
       onBranchPush,
@@ -197,6 +191,7 @@ function Branches({
     if (
       !showMenu &&
       !showSelect &&
+      !confirmDelete &&
       !newLocalBranchDialog &&
       !newRemoteBranchDialog
     ) {
@@ -215,6 +210,7 @@ function Branches({
     newLocalBranchDialog,
     newRemoteBranchDialog,
     showSelect,
+    confirmDelete,
   ]);
 
   return (
@@ -262,6 +258,20 @@ function Branches({
         setIsOpen={setShowSelect}
         onSelect={(name) => {
           onBranchPush(selectedBranch?.name ?? '', name);
+        }}
+      />
+
+      <Select
+        title='Are you sure?'
+        options={['no', 'yes']}
+        isOpen={confirmDelete}
+        setIsOpen={setConfirmDelete}
+        onSelect={(result) => {
+          if (result == 'yes' && selectedIndex !== null && onBranchCheckout) {
+            // if (onBranchCheckout) {
+            onBranchDelete(selectedBranch?.name ?? '');
+            // }
+          }
         }}
       />
     </div>

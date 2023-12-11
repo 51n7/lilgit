@@ -49,7 +49,7 @@ function Select({ title, options, isOpen, setIsOpen, onSelect }: SelectProps) {
   return (
     isOpen && (
       <nav>
-        <fieldset className='menu'>
+        <fieldset className='menu short'>
           <legend>{title}</legend>
 
           {options.map((option, index) => (

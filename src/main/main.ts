@@ -520,7 +520,8 @@ app.whenReady().then(() => {
       if (remote) {
         event.sender.send(
           'push-branch-success',
-          await git.push(['--set-upstream', remote, branch]),
+          // await git.push(['--set-upstream', remote, branch]),
+          await git.push(remote, branch),
         );
       } else {
         event.sender.send('push-branch-error', 'No remotes found.');
