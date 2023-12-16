@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'path';
 import os from 'os';
 import { simpleGit } from 'simple-git';
+import * as diff from 'diff';
 import Store from 'electron-store'; // https://github.com/sindresorhus/electron-store
 import chokidar from 'chokidar'; // https://github.com/paulmillr/chokidar
 import { RepoPathProp, ExtendMergeDetail } from 'src/types';
@@ -203,6 +204,39 @@ async function selectFolder(
         };
   }
   return null;
+}
+
+async function getUntrackedDiff(path: string): Promise<diff.ParsedDiff[]> {
+  const git = simpleGit(gitOptions(path));
+  let completeDiffResponse = '';
+
+  /*
+  converted the following command into JS
+  git ls-files --others --exclude-standard -z | xargs -0 -n 1 git --no-pager diff /dev/null
+  */
+
+  try {
+    // get untracked files
+    const lsFilesOutput = await git.raw([
+      'ls-files',
+      '--others',
+      '--exclude-standard',
+      '-z',
+    ]);
+    const untrackedFiles = lsFilesOutput.split('\0').filter(Boolean);
+
+    // return diff for each untracked file
+    const diffOutputs = await Promise.all(
+      untrackedFiles.map((file) => git.raw(['diff', '/dev/null', file])),
+    );
+
+    // convert git diff response to json
+    completeDiffResponse = diffOutputs.join('\n');
+    return diff.parsePatch(completeDiffResponse);
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
 }
 
 // Wait for Electron app to be ready before registering IPC listeners.
@@ -535,6 +569,17 @@ app.whenReady().then(() => {
     const git = simpleGit(gitOptions(path));
 
     event.sender.send('process-started', 'Fetching');
+
+    const trackedDiff = await git.diff(['HEAD']);
+    // const trackedDiff = await git.diff(['HEAD', 'README.md']); // get diff for tracked file
+    // const trackedDiff = await git.diff(['/dev/null', 'test.txt']); // get diff for untracked file
+
+    const result = {
+      tracked: diff.parsePatch(trackedDiff),
+      untracked: await getUntrackedDiff(path),
+    };
+    console.log(result);
+    // console.log(result.tracked[0].hunks);
 
     try {
       event.sender.send('fetch-branch-success', await git.fetch());

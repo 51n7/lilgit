@@ -128,9 +128,7 @@ function Status({
         key: 'D',
         description: 'discard all unstaged changes',
         function: () => {
-          if (selectedIndex !== null) {
-            setConfirmDiscard((confirmDiscard) => !confirmDiscard);
-          }
+          setConfirmDiscard((confirmDiscard) => !confirmDiscard);
         },
       },
       {
@@ -139,6 +137,15 @@ function Status({
           if (!showMenu && !outputOpen) {
             setSelectedIndex(null);
             removeCurrentRepo();
+          }
+        },
+      },
+      {
+        key: ' ', // space key
+        description: 'View Diff',
+        function: () => {
+          if (selectedIndex !== null) {
+            console.log(findFileById(transformStatus, selectedIndex));
           }
         },
       },
@@ -279,7 +286,7 @@ function Status({
         isOpen={confirmDiscard}
         setIsOpen={setConfirmDiscard}
         onSelect={(result) => {
-          if (result == 'yes' && selectedIndex !== null) {
+          if (result == 'yes') {
             onDiscard();
           }
         }}
