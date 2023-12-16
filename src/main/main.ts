@@ -172,19 +172,51 @@ async function deleteBranch(path: string, name: string) {
   }
 }
 
-// async function stageFile(path: string, name: string) {
-//   if (path) {
-//     const git = simpleGit(gitOptions(path));
-//     await git.add(name);
-//     return await git.status();
-//   }
-// }
+// type MyStatusResult = {
+//   not_added: string[];
+//   conflicted: string[];
+//   created: string[];
+//   deleted: string[];
+//   ignored?: string[];
+//   modified: string[];
+//   renamed: StatusResultRenamed[];
+//   staged: string[];
+//   files: FileStatusResult[];
+//   ahead: number;
+//   behind: number;
+//   current: string | null;
+//   tracking: string | null;
+//   detached: boolean;
+//   diff: {
+//     tracked: diff.ParsedDiff[],
+//     untracked: diff.ParsedDiff[],
+//   };
+// };
 
 async function getStatus(path: string) {
-  if (path) {
-    const git = simpleGit(gitOptions(path));
-    return await git.status();
-  }
+  const git = simpleGit(gitOptions(path));
+  const status = await git.status();
+
+  return {
+    not_added: status.not_added,
+    conflicted: status.conflicted,
+    created: status.created,
+    deleted: status.deleted,
+    ignored: status.ignored,
+    modified: status.modified,
+    renamed: status.renamed,
+    files: status.files,
+    staged: status.staged,
+    ahead: status.ahead,
+    behind: status.behind,
+    current: status.current,
+    tracking: status.tracking,
+    detached: status.detached,
+    diff: {
+      tracked: diff.parsePatch(await git.diff(['HEAD'])),
+      untracked: await getUntrackedDiff(path),
+    },
+  };
 }
 
 async function selectFolder(
@@ -289,7 +321,7 @@ app.whenReady().then(() => {
       debounce(async () => {
         sender.send(
           'directory-changed',
-          JSON.parse(JSON.stringify(await git.status())),
+          JSON.parse(JSON.stringify(await getStatus(absolute))),
           JSON.parse(JSON.stringify(await git.branch())),
         );
       }, 500);
@@ -405,7 +437,7 @@ app.whenReady().then(() => {
       await git.add(name);
       event.sender.send(
         'stage-file-success',
-        JSON.parse(JSON.stringify(await git.status())),
+        JSON.parse(JSON.stringify(await getStatus(path))),
       );
     } catch (err) {
       event.sender.send('stage-file-error', (err as Error).message);
@@ -419,7 +451,7 @@ app.whenReady().then(() => {
 
       event.sender.send(
         'unstage-file-success',
-        JSON.parse(JSON.stringify(await git.status())),
+        JSON.parse(JSON.stringify(await getStatus(path))),
       );
     } catch (err) {
       event.sender.send('unstage-file-error', (err as Error).message);
@@ -436,7 +468,7 @@ app.whenReady().then(() => {
 
       event.sender.send(
         'discard-success',
-        JSON.parse(JSON.stringify(await git.status())),
+        JSON.parse(JSON.stringify(await getStatus(path))),
       );
     } catch (err) {
       event.sender.send('discard-error', (err as Error).message);
@@ -451,7 +483,7 @@ app.whenReady().then(() => {
 
       event.sender.send(
         'discard-all-success',
-        JSON.parse(JSON.stringify(await git.status())),
+        JSON.parse(JSON.stringify(await getStatus(path))),
       );
     } catch (err) {
       event.sender.send('discard-all-error', (err as Error).message);
@@ -465,7 +497,7 @@ app.whenReady().then(() => {
 
       event.sender.send(
         'stage-all-success',
-        JSON.parse(JSON.stringify(await git.status())),
+        JSON.parse(JSON.stringify(await getStatus(path))),
       );
     } catch (err) {
       event.sender.send('stage-all-error', (err as Error).message);
@@ -479,7 +511,7 @@ app.whenReady().then(() => {
 
       event.sender.send(
         'stage-all-untracked-success',
-        JSON.parse(JSON.stringify(await git.status())),
+        JSON.parse(JSON.stringify(await getStatus(path))),
       );
     } catch (err) {
       event.sender.send('stage-all-untracked-error', (err as Error).message);
@@ -493,7 +525,7 @@ app.whenReady().then(() => {
 
       event.sender.send(
         'unstage-all-success',
-        JSON.parse(JSON.stringify(await git.status())),
+        JSON.parse(JSON.stringify(await getStatus(path))),
       );
     } catch (err) {
       event.sender.send('unstage-all-error', (err as Error).message);
@@ -507,7 +539,7 @@ app.whenReady().then(() => {
 
       event.sender.send(
         'commit-success',
-        JSON.parse(JSON.stringify(await git.status())),
+        JSON.parse(JSON.stringify(await getStatus(path))),
       );
     } catch (err) {
       event.sender.send('commit-error', (err as Error).message);
@@ -521,7 +553,7 @@ app.whenReady().then(() => {
 
       event.sender.send(
         'commit-unstaged-success',
-        JSON.parse(JSON.stringify(await git.status())),
+        JSON.parse(JSON.stringify(await getStatus(path))),
       );
     } catch (err) {
       event.sender.send('commit-unstaged-error', (err as Error).message);
@@ -614,11 +646,15 @@ app.whenReady().then(() => {
     }
   });
 
-  ipcMain.on('get-status', (event, path) => {
-    getStatus(path).then((path) => {
-      const cleanResponse = { ...path };
-      delete cleanResponse.isClean;
-      event.sender.send('get-status-success', cleanResponse);
-    });
+  ipcMain.on('get-status', async (event, path) => {
+    if (path) {
+      const status = await getStatus(path);
+
+      try {
+        event.sender.send('get-status-success', status);
+      } catch (err) {
+        event.sender.send('get-status-error', (err as Error).message);
+      }
+    }
   });
 });

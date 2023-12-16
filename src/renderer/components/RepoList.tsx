@@ -32,10 +32,11 @@ function RepoList({ onRepoSave, onRepoDelete, addRepo, list }: RepoListProps) {
         key: 'd',
         description: 'delete',
         function: () => {
-          onRepoDelete(selectedIndex ?? 0);
-          setShowMenu(false);
-          setSelectedIndex(null);
-          console.log('d key was hit in repo view');
+          if (selectedIndex !== null) {
+            onRepoDelete(selectedIndex ?? 0);
+            setShowMenu(false);
+            setSelectedIndex(null);
+          }
         },
       },
       {

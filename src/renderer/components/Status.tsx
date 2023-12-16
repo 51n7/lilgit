@@ -9,6 +9,7 @@ import { GitItem } from 'src/types';
 import Menu from './Menu';
 import Dialog from './Dialog';
 import Select from './Select';
+import * as diff from 'diff';
 
 export type StatusProps = {
   status: StatusResult | undefined;
@@ -145,7 +146,21 @@ function Status({
         description: 'View Diff',
         function: () => {
           if (selectedIndex !== null) {
-            console.log(findFileById(transformStatus, selectedIndex));
+            const file = findFileById(transformStatus, selectedIndex);
+            let diff: diff.ParsedDiff[] = [];
+
+            if (file?.status === '?') {
+              diff = status?.diff.untracked.find(
+                (item: { newFileName: string }) =>
+                  item.newFileName.replace(/^b\//, '') === file?.path,
+              );
+            } else {
+              diff = status?.diff.tracked.find(
+                (item: { oldFileName: string }) =>
+                  item.oldFileName.replace(/^a\//, '') === file?.path,
+              );
+            }
+            console.log(diff);
           }
         },
       },
@@ -159,16 +174,17 @@ function Status({
       },
     ],
     [
+      stageAll,
+      stageAllUntracked,
+      unstageAll,
       selectedIndex,
       onFileStage,
       transformStatus,
       onFileUnstage,
-      stageAll,
-      stageAllUntracked,
-      unstageAll,
       showMenu,
-      removeCurrentRepo,
       outputOpen,
+      removeCurrentRepo,
+      status,
     ],
   );
 

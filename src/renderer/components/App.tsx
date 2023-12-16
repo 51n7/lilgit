@@ -57,7 +57,7 @@ const App = () => {
   ];
 
   async function deleteRepo(index: number) {
-    if (index > 0) {
+    if (index >= 0) {
       const tmpArray = [...repoList];
       tmpArray.splice(index, 1);
       setRepoList(tmpArray);

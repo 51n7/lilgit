@@ -401,9 +401,12 @@ const exposedApi: ContextBridgeApi = {
     ipcRenderer.send('get-status', path);
 
     // -->
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       ipcRenderer.once('get-status-success', (_event, data: StatusResult) =>
         resolve(data),
+      );
+      ipcRenderer.once('get-branch-error', (_event, error) =>
+        reject(new Error(error)),
       );
     });
   },
