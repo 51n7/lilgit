@@ -1,8 +1,7 @@
-import { StatusResult } from 'simple-git';
-import { GitItem, TransformedStatus } from 'src/types';
+import { ExtendedStatusResult, GitItem, TransformedStatus } from 'src/types';
 
 export function convertGitResponse(
-  response: StatusResult | undefined,
+  response: ExtendedStatusResult | undefined,
 ): TransformedStatus {
   const baseResponse = {
     unstaged: [],

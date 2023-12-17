@@ -5,7 +5,11 @@ import { simpleGit } from 'simple-git';
 import * as diff from 'diff';
 import Store from 'electron-store'; // https://github.com/sindresorhus/electron-store
 import chokidar from 'chokidar'; // https://github.com/paulmillr/chokidar
-import { RepoPathProp, ExtendMergeDetail } from 'src/types';
+import {
+  RepoPathProp,
+  ExtendMergeDetail,
+  ExtendedStatusResult,
+} from 'src/types';
 
 /** Handle creating/removing shortcuts on Windows when installing/uninstalling. */
 if (require('electron-squirrel-startup')) {
@@ -172,28 +176,7 @@ async function deleteBranch(path: string, name: string) {
   }
 }
 
-// type MyStatusResult = {
-//   not_added: string[];
-//   conflicted: string[];
-//   created: string[];
-//   deleted: string[];
-//   ignored?: string[];
-//   modified: string[];
-//   renamed: StatusResultRenamed[];
-//   staged: string[];
-//   files: FileStatusResult[];
-//   ahead: number;
-//   behind: number;
-//   current: string | null;
-//   tracking: string | null;
-//   detached: boolean;
-//   diff: {
-//     tracked: diff.ParsedDiff[],
-//     untracked: diff.ParsedDiff[],
-//   };
-// };
-
-async function getStatus(path: string) {
+async function getStatus(path: string): Promise<ExtendedStatusResult> {
   const git = simpleGit(gitOptions(path));
   const status = await git.status();
 

@@ -1,18 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
-import { StatusResult } from 'simple-git';
 import {
   convertGitResponse,
   findFileById,
 } from '../../../src/helpers/status.helpers';
 import StatusList from './StatusList';
-import { GitItem } from 'src/types';
+import { ExtendedStatusResult, GitItem } from 'src/types';
 import Menu from './Menu';
 import Dialog from './Dialog';
 import Select from './Select';
 import * as diff from 'diff';
 
 export type StatusProps = {
-  status: StatusResult | undefined;
+  status: ExtendedStatusResult | undefined;
   onFileStage: (name: string) => void;
   onFileUnstage: (name: string) => void;
   onFileDiscard: (name: string) => void;
@@ -147,18 +146,24 @@ function Status({
         function: () => {
           if (selectedIndex !== null) {
             const file = findFileById(transformStatus, selectedIndex);
-            let diff: diff.ParsedDiff[] = [];
+            let diff: diff.ParsedDiff | null = null;
 
             if (file?.status === '?') {
-              diff = status?.diff.untracked.find(
-                (item: { newFileName: string }) =>
-                  item.newFileName.replace(/^b\//, '') === file?.path,
+              const untrackedItem = status?.diff.untracked.find(
+                (item) => item.newFileName?.replace(/^b\//, '') === file?.path,
               );
+
+              if (untrackedItem) {
+                diff = untrackedItem;
+              }
             } else {
-              diff = status?.diff.tracked.find(
-                (item: { oldFileName: string }) =>
-                  item.oldFileName.replace(/^a\//, '') === file?.path,
+              const trackedItem = status?.diff.tracked.find(
+                (item) => item.oldFileName?.replace(/^a\//, '') === file?.path,
               );
+
+              if (trackedItem) {
+                diff = trackedItem;
+              }
             }
             console.log(diff);
           }

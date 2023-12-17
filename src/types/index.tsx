@@ -1,4 +1,5 @@
-import { BranchSummary, MergeDetail } from 'simple-git';
+import { BranchSummary, MergeDetail, StatusResult } from 'simple-git';
+import * as diff from 'diff';
 
 export type RepoPathProp = {
   absolute: string;
@@ -57,4 +58,11 @@ export type GitLogEntry = {
 
 export type ExtendMergeDetail = Error & {
   git?: MergeDetail;
+};
+
+export type ExtendedStatusResult = Omit<StatusResult, 'isClean'> & {
+  diff: {
+    tracked: diff.ParsedDiff[];
+    untracked: diff.ParsedDiff[];
+  };
 };

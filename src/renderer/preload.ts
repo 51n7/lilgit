@@ -5,8 +5,13 @@
 // We use it in the preload instead of renderer in order to expose only
 // whitelisted wrappers to increase the security of our application.
 import { contextBridge, ipcRenderer } from 'electron';
-import { RepoPathProp, GitLogEntry, ExtendMergeDetail } from 'src/types';
-import { BranchSummary, MergeDetail, StatusResult } from 'simple-git';
+import {
+  RepoPathProp,
+  GitLogEntry,
+  ExtendMergeDetail,
+  ExtendedStatusResult,
+} from 'src/types';
+import { BranchSummary, MergeDetail } from 'simple-git';
 
 // Create a type that should contain all the data we need to expose in the
 // renderer process using `contextBridge`.
@@ -35,21 +40,32 @@ export type ContextBridgeApi = {
     path: string | undefined,
     name: string,
   ) => Promise<BranchSummary>;
-  stageFile: (path: string | undefined, name: string) => Promise<StatusResult>;
+  stageFile: (
+    path: string | undefined,
+    name: string,
+  ) => Promise<ExtendedStatusResult>;
   unstageFile: (
     path: string | undefined,
     name: string,
-  ) => Promise<StatusResult>;
-  discard: (path: string | undefined, name: string) => Promise<StatusResult>;
-  discardAll: (path: string | undefined) => Promise<StatusResult>;
-  stageAll: (path: string | undefined) => Promise<StatusResult>;
-  stageAllUntracked: (path: string | undefined) => Promise<StatusResult>;
-  unstageAll: (path: string | undefined) => Promise<StatusResult>;
-  commit: (path: string | undefined, message: string) => Promise<StatusResult>;
+  ) => Promise<ExtendedStatusResult>;
+  discard: (
+    path: string | undefined,
+    name: string,
+  ) => Promise<ExtendedStatusResult>;
+  discardAll: (path: string | undefined) => Promise<ExtendedStatusResult>;
+  stageAll: (path: string | undefined) => Promise<ExtendedStatusResult>;
+  stageAllUntracked: (
+    path: string | undefined,
+  ) => Promise<ExtendedStatusResult>;
+  unstageAll: (path: string | undefined) => Promise<ExtendedStatusResult>;
+  commit: (
+    path: string | undefined,
+    message: string,
+  ) => Promise<ExtendedStatusResult>;
   commitUnstaged: (
     path: string | undefined,
     message: string,
-  ) => Promise<StatusResult>;
+  ) => Promise<ExtendedStatusResult>;
   pullBranch: (path: string | undefined, branch: string) => Promise<string>;
   pushBranch: (
     path: string | undefined,
@@ -62,10 +78,10 @@ export type ContextBridgeApi = {
     selected: string,
     current: string,
   ) => Promise<string>;
-  getStatus: (path: string | undefined) => Promise<StatusResult>;
+  getStatus: (path: string | undefined) => Promise<ExtendedStatusResult>;
   onProcessStarted: (listener: (message: string) => void) => void;
   onDirectoryChanged: (
-    listener: (status: StatusResult, branches: BranchSummary) => void,
+    listener: (status: ExtendedStatusResult, branches: BranchSummary) => void,
   ) => void;
 };
 
@@ -215,8 +231,9 @@ const exposedApi: ContextBridgeApi = {
     ipcRenderer.send('stage-file', path, name);
 
     return new Promise((resolve, reject) => {
-      ipcRenderer.once('stage-file-success', (_event, data: StatusResult) =>
-        resolve(data),
+      ipcRenderer.once(
+        'stage-file-success',
+        (_event, data: ExtendedStatusResult) => resolve(data),
       );
       ipcRenderer.once('stage-file-error', (_event, error) =>
         reject(new Error(error)),
@@ -228,8 +245,9 @@ const exposedApi: ContextBridgeApi = {
     ipcRenderer.send('unstage-file', path, name);
 
     return new Promise((resolve, reject) => {
-      ipcRenderer.once('unstage-file-success', (_event, data: StatusResult) =>
-        resolve(data),
+      ipcRenderer.once(
+        'unstage-file-success',
+        (_event, data: ExtendedStatusResult) => resolve(data),
       );
       ipcRenderer.once('unstage-file-error', (_event, error) =>
         reject(new Error(error)),
@@ -241,8 +259,9 @@ const exposedApi: ContextBridgeApi = {
     ipcRenderer.send('discard', path, name);
 
     return new Promise((resolve, reject) => {
-      ipcRenderer.once('discard-success', (_event, data: StatusResult) =>
-        resolve(data),
+      ipcRenderer.once(
+        'discard-success',
+        (_event, data: ExtendedStatusResult) => resolve(data),
       );
       ipcRenderer.once('discard-error', (_event, error) =>
         reject(new Error(error)),
@@ -254,8 +273,9 @@ const exposedApi: ContextBridgeApi = {
     ipcRenderer.send('discard-all', path);
 
     return new Promise((resolve, reject) => {
-      ipcRenderer.once('discard-all-success', (_event, data: StatusResult) =>
-        resolve(data),
+      ipcRenderer.once(
+        'discard-all-success',
+        (_event, data: ExtendedStatusResult) => resolve(data),
       );
       ipcRenderer.once('discard-all-error', (_event, error) =>
         reject(new Error(error)),
@@ -267,8 +287,9 @@ const exposedApi: ContextBridgeApi = {
     ipcRenderer.send('stage-all', path);
 
     return new Promise((resolve, reject) => {
-      ipcRenderer.once('stage-all-success', (_event, data: StatusResult) =>
-        resolve(data),
+      ipcRenderer.once(
+        'stage-all-success',
+        (_event, data: ExtendedStatusResult) => resolve(data),
       );
       ipcRenderer.once('stage-all-error', (_event, error) =>
         reject(new Error(error)),
@@ -282,7 +303,7 @@ const exposedApi: ContextBridgeApi = {
     return new Promise((resolve, reject) => {
       ipcRenderer.once(
         'stage-all-untracked-success',
-        (_event, data: StatusResult) => resolve(data),
+        (_event, data: ExtendedStatusResult) => resolve(data),
       );
       ipcRenderer.once('stage-all-untracked-error', (_event, error) =>
         reject(new Error(error)),
@@ -294,8 +315,9 @@ const exposedApi: ContextBridgeApi = {
     ipcRenderer.send('unstage-all', path);
 
     return new Promise((resolve, reject) => {
-      ipcRenderer.once('unstage-all-success', (_event, data: StatusResult) =>
-        resolve(data),
+      ipcRenderer.once(
+        'unstage-all-success',
+        (_event, data: ExtendedStatusResult) => resolve(data),
       );
       ipcRenderer.once('unstage-all-error', (_event, error) =>
         reject(new Error(error)),
@@ -307,7 +329,7 @@ const exposedApi: ContextBridgeApi = {
     ipcRenderer.send('commit', path, message);
 
     return new Promise((resolve, reject) => {
-      ipcRenderer.once('commit-success', (_event, data: StatusResult) =>
+      ipcRenderer.once('commit-success', (_event, data: ExtendedStatusResult) =>
         resolve(data),
       );
       ipcRenderer.once('commit-error', (_event, error) =>
@@ -322,7 +344,7 @@ const exposedApi: ContextBridgeApi = {
     return new Promise((resolve, reject) => {
       ipcRenderer.once(
         'commit-unstaged-success',
-        (_event, data: StatusResult) => resolve(data),
+        (_event, data: ExtendedStatusResult) => resolve(data),
       );
       ipcRenderer.once('commit-unstaged-error', (_event, error) =>
         reject(new Error(error)),
@@ -402,8 +424,9 @@ const exposedApi: ContextBridgeApi = {
 
     // -->
     return new Promise((resolve, reject) => {
-      ipcRenderer.once('get-status-success', (_event, data: StatusResult) =>
-        resolve(data),
+      ipcRenderer.once(
+        'get-status-success',
+        (_event, data: ExtendedStatusResult) => resolve(data),
       );
       ipcRenderer.once('get-branch-error', (_event, error) =>
         reject(new Error(error)),
@@ -418,7 +441,7 @@ const exposedApi: ContextBridgeApi = {
   onDirectoryChanged: (listener) => {
     ipcRenderer.on(
       'directory-changed',
-      (_event, status: StatusResult, branches: BranchSummary) =>
+      (_event, status: ExtendedStatusResult, branches: BranchSummary) =>
         listener(status, branches),
     );
   },

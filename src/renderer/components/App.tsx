@@ -4,8 +4,9 @@ import {
   TransformBranch,
   GitLogEntry,
   ExtendMergeDetail,
+  ExtendedStatusResult,
 } from 'src/types';
-import { StatusResult, BranchSummary } from 'simple-git';
+import { BranchSummary } from 'simple-git';
 import Status from './Status';
 import Branches from './Branches';
 import Graph from './Graph';
@@ -18,7 +19,7 @@ const App = () => {
   const [loadingMsg, setLoadingMsg] = useState<string>('');
   const [repoList, setRepoList] = useState<RepoPathProp[]>([]);
   const [currentRepo, setCurrentRepo] = useState<RepoPathProp | undefined>();
-  const [status, setStatus] = useState<StatusResult>();
+  const [status, setStatus] = useState<ExtendedStatusResult>();
   const [branchList, setBranchList] = useState<BranchSummary>();
   const [graphList, setGraphList] = useState<GitLogEntry[]>();
   const [viewState, setViewState] = useState<number>(0);
@@ -253,7 +254,7 @@ const App = () => {
     });
 
     window.api.onDirectoryChanged(
-      (status: StatusResult, branches: BranchSummary) => {
+      (status: ExtendedStatusResult, branches: BranchSummary) => {
         setStatus(status);
         setBranchList(branches);
       },
