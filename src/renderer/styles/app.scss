@@ -1,4 +1,5 @@
 @import './reset.scss';
+@import './colors.scss';
 
 @font-face {
   font-family: 'Menlo';
@@ -8,15 +9,6 @@
   font-style: normal;
   font-display: swap;
 }
-
-$bg: #22272e;
-$white: #acb9c6;
-$grey-light: #adbac7;
-$grey: #768390;
-$red: #f47067;
-$green: #8ddb8c;
-// $blue-light: #6bb5fd;
-$blue: #6cb6ff;
 
 ::-webkit-scrollbar {
   display: none;

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { DiffResult, GitItem } from 'src/types';
 import * as diff from 'diff';
+import '$styles/diff.scss';
 
 type DiffProps = {
   diff?: DiffResult;
@@ -48,24 +49,34 @@ function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
 
   return (
     isOpen && (
-      <nav>
+      <nav className='view-diff'>
         <fieldset className='menu'>
           <legend>{file?.path}</legend>
 
           {diffOutput?.hunks.map((hunk, index) => (
-            <div key={index}>
-              <div>
-                <strong>Hunk {index + 1}:</strong>
-              </div>
-              <div>
-                <strong>Lines:</strong>
-                <ul>
-                  {hunk.lines.map((line, lineIndex) => (
-                    <li key={lineIndex}>{line}</li>
-                  ))}
-                </ul>
-              </div>
-              <br />
+            <div key={index} className='hunk'>
+              {diffOutput?.hunks && diffOutput?.hunks.length > 1 && (
+                <p>
+                  <strong>Hunk {index + 1}:</strong>
+                </p>
+              )}
+              <ul className='lines'>
+                {hunk.lines.map((line, lineIndex) => {
+                  let className = '';
+
+                  if (line.charAt(0) === '+') {
+                    className = ' add';
+                  } else if (line.charAt(0) === '-') {
+                    className = ' remove';
+                  }
+
+                  return (
+                    <li key={lineIndex} className={`line${className}`}>
+                      {line.substring(1)}
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           ))}
         </fieldset>

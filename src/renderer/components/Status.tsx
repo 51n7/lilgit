@@ -143,7 +143,7 @@ function Status({
       },
       {
         key: ' ', // space key
-        description: 'View Diff',
+        description: 'view diff',
         function: () => {
           if (selectedIndex !== null) {
             setDiffView((diffView) => !diffView);

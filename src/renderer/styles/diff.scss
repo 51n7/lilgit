@@ -1,0 +1,30 @@
+@import './colors.scss';
+
+.view-diff {
+  .menu {
+    max-height: 85vh;
+    overflow: scroll;
+  }
+
+  .hunk {
+    &:not(:last-child) {
+      margin-block-end: 1rem;
+    }
+
+    .lines {
+      white-space: pre-wrap;
+
+      .line {
+        padding: 0;
+      }
+
+      .add {
+        background-color: $green-dark;
+      }
+
+      .remove {
+        background-color: #ab443d;
+      }
+    }
+  }
+}
