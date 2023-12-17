@@ -61,8 +61,10 @@ export type ExtendMergeDetail = Error & {
 };
 
 export type ExtendedStatusResult = Omit<StatusResult, 'isClean'> & {
-  diff: {
-    tracked: diff.ParsedDiff[];
-    untracked: diff.ParsedDiff[];
-  };
+  diff: DiffResult;
+};
+
+export type DiffResult = {
+  tracked: diff.ParsedDiff[];
+  untracked: diff.ParsedDiff[];
 };

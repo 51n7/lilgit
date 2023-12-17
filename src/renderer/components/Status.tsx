@@ -8,7 +8,7 @@ import { ExtendedStatusResult, GitItem } from 'src/types';
 import Menu from './Menu';
 import Dialog from './Dialog';
 import Select from './Select';
-import * as diff from 'diff';
+import Diff from './Diff';
 
 export type StatusProps = {
   status: ExtendedStatusResult | undefined;
@@ -45,6 +45,7 @@ function Status({
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [confirmFileDiscard, setConfirmFileDiscard] = useState<boolean>(false);
   const [confirmDiscard, setConfirmDiscard] = useState<boolean>(false);
+  const [diffView, setDiffView] = useState<boolean>(false);
   const [showCommitUnstagedDialog, setShowCommitUnstagedDialog] =
     useState<boolean>(false);
   const [showCommitDialog, setShowCommitDialog] = useState<boolean>(false);
@@ -145,27 +146,7 @@ function Status({
         description: 'View Diff',
         function: () => {
           if (selectedIndex !== null) {
-            const file = findFileById(transformStatus, selectedIndex);
-            let diff: diff.ParsedDiff | null = null;
-
-            if (file?.status === '?') {
-              const untrackedItem = status?.diff.untracked.find(
-                (item) => item.newFileName?.replace(/^b\//, '') === file?.path,
-              );
-
-              if (untrackedItem) {
-                diff = untrackedItem;
-              }
-            } else {
-              const trackedItem = status?.diff.tracked.find(
-                (item) => item.oldFileName?.replace(/^a\//, '') === file?.path,
-              );
-
-              if (trackedItem) {
-                diff = trackedItem;
-              }
-            }
-            console.log(diff);
+            setDiffView((diffView) => !diffView);
           }
         },
       },
@@ -189,7 +170,6 @@ function Status({
       showMenu,
       outputOpen,
       removeCurrentRepo,
-      status,
     ],
   );
 
@@ -289,7 +269,7 @@ function Status({
 
       <Select
         title='Are you sure?'
-        options={['no', 'yes']}
+        options={['yes', 'no']}
         isOpen={confirmFileDiscard}
         setIsOpen={setConfirmFileDiscard}
         onSelect={(result) => {
@@ -303,7 +283,7 @@ function Status({
 
       <Select
         title='Are you sure?'
-        options={['no', 'yes']}
+        options={['yes', 'no']}
         isOpen={confirmDiscard}
         setIsOpen={setConfirmDiscard}
         onSelect={(result) => {
@@ -311,6 +291,13 @@ function Status({
             onDiscard();
           }
         }}
+      />
+
+      <Diff
+        diff={status?.diff}
+        file={findFileById(transformStatus, selectedIndex || 0)}
+        isOpen={diffView}
+        setIsOpen={setDiffView}
       />
     </div>
   );
