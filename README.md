@@ -76,4 +76,19 @@ The application relies on one simple menu that can be opened by hitting `?` (or 
     </tr>
 </table>
 
+<table>
+    <tr>
+        <th>Diff</th>
+    </tr>
+    <tr>
+        <td width="50%">
+            <img src="https://github.com/51n7/lilgit/assets/2657818/c535e0de-cd26-4ddd-86c2-d1f0365129e6" width="100%">
+        </td>
+    </tr>
+    <tr>
+        <td width="50%">Navigate diff view.</td>
+    </tr>
+</table>
+
+
 
