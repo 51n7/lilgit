@@ -56,9 +56,7 @@ function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
           {diffOutput?.hunks.map((hunk, index) => (
             <div key={index} className='hunk'>
               {diffOutput?.hunks && diffOutput?.hunks.length > 1 && (
-                <p>
-                  <strong>Hunk {index + 1}:</strong>
-                </p>
+                <div className='title'>Hunk {index + 1}:</div>
               )}
               <ul className='lines'>
                 {hunk.lines.map((line, lineIndex) => {
@@ -74,7 +72,7 @@ function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
 
                   return (
                     <li key={lineIndex} className={`line${className}`}>
-                      {line.substring(1)}
+                      <span>{line.substring(1)}</span>
                     </li>
                   );
                 })}

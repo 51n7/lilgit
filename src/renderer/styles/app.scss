@@ -183,6 +183,7 @@ nav {
     background-color: $bg;
     width: 75%;
     border: 2px solid $white;
+    min-width: 0;
 
     &.short {
       min-width: 40%;
@@ -269,7 +270,7 @@ nav {
 .resizable-box {
   position: fixed;
   width: 100%;
-  background-color: #1d2127;
+  background-color: $bg-dark;
   box-shadow: inset 0px 0px 0px 2px $white;
   bottom: 0;
   padding: 1rem;
