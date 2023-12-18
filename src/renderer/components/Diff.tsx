@@ -68,6 +68,8 @@ function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
                     className = ' add';
                   } else if (line.charAt(0) === '-') {
                     className = ' remove';
+                  } else if (line === '\\ No newline at end of file') {
+                    className = ' hide';
                   }
 
                   return (
