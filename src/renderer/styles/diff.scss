@@ -16,6 +16,11 @@
 
       .line {
         padding: 0;
+
+        &:empty::before {
+          content: '\00a0';
+          position: static;
+        }
       }
 
       .add {

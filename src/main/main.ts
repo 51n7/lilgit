@@ -585,17 +585,6 @@ app.whenReady().then(() => {
 
     event.sender.send('process-started', 'Fetching');
 
-    const trackedDiff = await git.diff(['HEAD']);
-    // const trackedDiff = await git.diff(['HEAD', 'README.md']); // get diff for tracked file
-    // const trackedDiff = await git.diff(['/dev/null', 'test.txt']); // get diff for untracked file
-
-    const result = {
-      tracked: diff.parsePatch(trackedDiff),
-      untracked: await getUntrackedDiff(path),
-    };
-    console.log(result);
-    // console.log(result.tracked[0].hunks);
-
     try {
       event.sender.send('fetch-branch-success', await git.fetch());
     } catch (err) {
