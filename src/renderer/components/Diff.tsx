@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { DiffResult, GitItem } from 'src/types';
 import * as diff from 'diff';
 import '$styles/diff.scss';
@@ -11,9 +11,50 @@ type DiffProps = {
 };
 
 function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
+  const [diffTest, setDiffTest] = useState<diff.ParsedDiff | null>();
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    setCount(0);
+  }, [file]);
+
+  useEffect(() => {
+    if (file?.status === '?') {
+      const untrackedItem = diff?.untracked.find(
+        (item) => item.newFileName?.replace(/^b\//, '') === file?.path,
+      );
+
+      if (untrackedItem) {
+        setDiffTest(untrackedItem);
+      }
+    } else {
+      const trackedItem = diff?.tracked.find(
+        (item) => item.oldFileName?.replace(/^a\//, '') === file?.path,
+      );
+
+      if (trackedItem) {
+        setDiffTest(trackedItem);
+      }
+    }
+  }, [diff?.tracked, diff?.untracked, file?.path, file?.status]);
+
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === ',') {
+        event.preventDefault();
+        if ((diffTest?.hunks.length || 0) > 1) {
+          setCount((prevCount) =>
+            prevCount === 0 ? diffTest?.hunks.length || 0 : prevCount - 1,
+          );
+        }
+      } else if (event.key === '.') {
+        event.preventDefault();
+        if ((diffTest?.hunks.length || 0) > 1) {
+          setCount((prevCount) =>
+            prevCount === diffTest?.hunks.length ? 0 : prevCount + 1,
+          );
+        }
+      } else if (event.key === 'Escape') {
         setIsOpen(false);
       }
     };
@@ -25,41 +66,46 @@ function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [isOpen, setIsOpen]);
-
-  let diffOutput: diff.ParsedDiff | null = null;
-
-  if (file?.status === '?') {
-    const untrackedItem = diff?.untracked.find(
-      (item) => item.newFileName?.replace(/^b\//, '') === file?.path,
-    );
-
-    if (untrackedItem) {
-      diffOutput = untrackedItem;
-    }
-  } else {
-    const trackedItem = diff?.tracked.find(
-      (item) => item.oldFileName?.replace(/^a\//, '') === file?.path,
-    );
-
-    if (trackedItem) {
-      diffOutput = trackedItem;
-    }
-  }
+  }, [diffTest, isOpen, setIsOpen, file]);
 
   return (
     isOpen && (
       <nav className='view-diff'>
         <fieldset className='menu'>
-          <legend>{file?.path}</legend>
+          <legend>
+            {file?.path}
+            {count !== 0 ? ` - ${count}/${diffTest?.hunks.length}` : ''}
+          </legend>
 
-          {diffOutput?.hunks.map((hunk, index) => (
-            <div key={index} className='hunk'>
-              {diffOutput?.hunks && diffOutput?.hunks.length > 1 && (
-                <div className='title'>Hunk {index + 1}:</div>
-              )}
+          {count === 0 &&
+            diffTest?.hunks.map((hunk, index) => (
+              <div key={index} className='hunk'>
+                <ul className='lines'>
+                  {hunk.lines.map((line, lineIndex) => {
+                    let className = '';
+
+                    if (line.charAt(0) === '+') {
+                      className = ' add';
+                    } else if (line.charAt(0) === '-') {
+                      className = ' remove';
+                    } else if (line === '\\ No newline at end of file') {
+                      className = ' hide';
+                    }
+
+                    return (
+                      <li key={lineIndex} className={`line${className}`}>
+                        <span>{line.substring(1)}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+
+          {count !== 0 && (
+            <div key={count} className='hunk'>
               <ul className='lines'>
-                {hunk.lines.map((line, lineIndex) => {
+                {diffTest?.hunks[count - 1].lines.map((line, lineIndex) => {
                   let className = '';
 
                   if (line.charAt(0) === '+') {
@@ -78,7 +124,7 @@ function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
                 })}
               </ul>
             </div>
-          ))}
+          )}
         </fieldset>
       </nav>
     )
