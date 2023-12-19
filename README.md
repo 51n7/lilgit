@@ -10,11 +10,12 @@ npm run start
 ```
 
 ### Shortcuts
-| Command         | Shortcut             |
-| :-------------- | :------------------- |
-| Open Menu       | <kbd>Shift + /</kbd> |
-| Navigate Views  | <kbd>Tab</kbd>       |
-| Navigate Back   | <kbd>Esc</kbd>       |
+| Command         | Shortcut                   |
+| :-------------- | :------------------------- |
+| Open Menu       | <kbd>Shift + /</kbd>       |
+| Navigate Views  | <kbd>Tab</kbd>             |
+| Navigate Back   | <kbd>Esc</kbd>             |
+| Navigate Hunks   | <kbd><</kbd> <kbd>></kbd> |
 
 
 ## Usage
@@ -82,13 +83,16 @@ The application relies on one simple menu that can be opened by hitting `?` (or 
     </tr>
     <tr>
         <td width="50%">
-            <img src="https://github.com/51n7/lilgit/assets/2657818/c535e0de-cd26-4ddd-86c2-d1f0365129e6" width="100%">
+            <!-- <img src="https://github.com/51n7/lilgit/assets/2657818/c535e0de-cd26-4ddd-86c2-d1f0365129e6" width="100%"> -->
+            <img src="https://github.com/51n7/lilgit/assets/2657818/657bd647-c169-470c-9cd6-c0a6eafa7fcf" width="100%">
         </td>
     </tr>
     <tr>
-        <td width="50%">Navigate diff view.</td>
+        <td width="50%">Navigate file diff and hunks.</td>
     </tr>
 </table>
+
+
 
 
 
