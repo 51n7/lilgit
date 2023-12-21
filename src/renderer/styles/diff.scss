@@ -1,6 +1,47 @@
 @import './colors.scss';
 
 .view-diff {
+  .hljs {
+    background-color: transparent;
+    z-index: 1;
+    position: relative;
+  }
+
+  pre {
+    position: relative;
+    margin: 0;
+
+    &:not(:last-child) {
+      border-block-end: 2px solid #acb9c6;
+    }
+  }
+
+  .menu:has(legend:only-child) {
+    display: none;
+  }
+
+  .background-lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 1em 0;
+
+    span {
+      display: block;
+    }
+
+    .add {
+      // background-color: #34583c;
+      background-color: #31683d;
+    }
+
+    .remove {
+      // background-color: #733f40;
+      background-color: #953c3e;
+    }
+  }
+
   .menu {
     max-height: 85%;
     overflow: auto;

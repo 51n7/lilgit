@@ -294,6 +294,7 @@ function Status({
       />
 
       <Diff
+        key={selectedIndex}
         diff={status?.diff}
         file={findFileById(transformStatus, selectedIndex || 0)}
         isOpen={diffView}
