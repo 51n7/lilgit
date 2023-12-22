@@ -84,13 +84,15 @@ The application relies on one simple menu that can be opened by hitting `?` (or 
     <tr>
         <td width="50%">
             <!-- <img src="https://github.com/51n7/lilgit/assets/2657818/c535e0de-cd26-4ddd-86c2-d1f0365129e6" width="100%"> -->
-            <img src="https://github.com/51n7/lilgit/assets/2657818/657bd647-c169-470c-9cd6-c0a6eafa7fcf" width="100%">
+            <!-- <img src="https://github.com/51n7/lilgit/assets/2657818/657bd647-c169-470c-9cd6-c0a6eafa7fcf" width="100%"> -->
+            <img src="https://github.com/51n7/lilgit/assets/2657818/4dd51508-41e8-4a34-ae57-9b07d1f70555" width="100%">
         </td>
     </tr>
     <tr>
         <td width="50%">Navigate file diff and hunks.</td>
     </tr>
 </table>
+
 
 
 
