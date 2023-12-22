@@ -14,17 +14,19 @@ type DiffProps = {
 };
 
 function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
-  const [diffTest, setDiffTest] = useState<diff.ParsedDiff | null>();
+  const [fileDiff, setFileDiff] = useState<diff.ParsedDiff | null>();
   const [count, setCount] = useState(0);
   const fileExtension = file?.path.split('.').pop();
-  const divRefs = useRef<(React.RefObject<HTMLDivElement> | null)[]>([]);
+  const hunkRefs = useRef<(React.RefObject<HTMLDivElement> | null)[]>([]);
+  const hunkRef = useRef<HTMLDivElement>(null);
+  const stringsToRemove = [`\\ No newline at end of file`];
 
-  // reset hunks if navigating up/down and sibling doesnt have the same count
+  // reset hunks if navigating files up/down and file doesnt have the same hunk count
   useEffect(() => {
-    if (!diffTest?.hunks[count - 1]) {
+    if (!fileDiff?.hunks[count - 1]) {
       setCount(0);
     }
-  }, [count, diffTest?.hunks]);
+  }, [count, fileDiff?.hunks]);
 
   useEffect(() => {
     if (isOpen) {
@@ -33,13 +35,23 @@ function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
   }, [isOpen]);
 
   useEffect(() => {
+    if (hunkRef.current) {
+      const currentElement = hunkRef.current;
+
+      if (currentElement && !currentElement.classList.contains('hljs')) {
+        hljs.highlightElement(currentElement);
+      }
+    }
+  }, [count]);
+
+  useEffect(() => {
     if (file?.status === '?') {
       const untrackedItem = diff?.untracked.find(
         (item) => item.newFileName?.replace(/^b\//, '') === file?.path,
       );
 
       if (untrackedItem) {
-        setDiffTest(untrackedItem);
+        setFileDiff(untrackedItem);
       }
     } else {
       const trackedItem = diff?.tracked.find(
@@ -47,7 +59,7 @@ function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
       );
 
       if (trackedItem) {
-        setDiffTest(trackedItem);
+        setFileDiff(trackedItem);
       }
     }
   }, [diff?.tracked, diff?.untracked, file?.path, file?.status]);
@@ -56,16 +68,16 @@ function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === ',') {
         event.preventDefault();
-        if ((diffTest?.hunks.length || 0) > 1) {
+        if ((fileDiff?.hunks.length || 0) > 1) {
           setCount((prevCount) =>
-            prevCount === 0 ? diffTest?.hunks.length || 0 : prevCount - 1,
+            prevCount === 0 ? fileDiff?.hunks.length || 0 : prevCount - 1,
           );
         }
       } else if (event.key === '.') {
         event.preventDefault();
-        if ((diffTest?.hunks.length || 0) > 1) {
+        if ((fileDiff?.hunks.length || 0) > 1) {
           setCount((prevCount) =>
-            prevCount === diffTest?.hunks.length ? 0 : prevCount + 1,
+            prevCount === fileDiff?.hunks.length ? 0 : prevCount + 1,
           );
         }
       } else if (event.key === 'Escape') {
@@ -80,9 +92,7 @@ function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [diffTest, isOpen, setIsOpen]);
-
-  // console.log(diffTest?.hunks[0].lines.join('\n'));
+  }, [fileDiff, isOpen, setIsOpen]);
 
   return (
     isOpen && (
@@ -90,12 +100,11 @@ function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
         <fieldset className='menu'>
           <legend>
             {file?.path}
-            {count !== 0 ? ` - ${count}/${diffTest?.hunks.length}` : ''}
+            {count !== 0 ? ` - ${count}/${fileDiff?.hunks.length}` : ''}
           </legend>
 
           {count === 0 &&
-            diffTest?.hunks.map((hunk, index) => {
-              const stringsToRemove = ['\\ No newline at end of file'];
+            fileDiff?.hunks.map((hunk, index) => {
               const concatenatedHTML = hunk.lines
                 .filter(
                   (htmlString) => !stringsToRemove.includes(htmlString.trim()),
@@ -104,11 +113,11 @@ function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
                 .join('\n');
 
               const divRef =
-                divRefs.current[index] ||
-                (divRefs.current[index] = React.createRef<HTMLDivElement>());
+                hunkRefs.current[index] ||
+                (hunkRefs.current[index] = React.createRef<HTMLDivElement>());
 
               if (divRef.current) {
-                const currentElement = divRefs.current[index]?.current;
+                const currentElement = hunkRefs.current[index]?.current;
 
                 if (
                   currentElement &&
@@ -118,95 +127,78 @@ function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
                 }
               }
 
-              const diffLines = hunk.lines
-                .filter(
-                  (htmlString) => !stringsToRemove.includes(htmlString.trim()),
-                )
-                .map((line) => line.charAt(0));
-
               return (
                 <pre key={index}>
                   <code key={index} ref={divRef} className={fileExtension}>
                     {concatenatedHTML}
                   </code>
                   <div className='background-lines'>
-                    {diffLines.map((char, index) => {
-                      let className = '';
+                    {hunk.lines
+                      .filter(
+                        (htmlString) =>
+                          !stringsToRemove.includes(htmlString.trim()),
+                      )
+                      .map((line, index) => {
+                        let className = '';
+                        const firstChar = line.charAt(0);
 
-                      if (char === '+') {
-                        className = ' add';
-                      } else if (char === '-') {
-                        className = ' remove';
-                      } else if (char === '\\ No newline at end of file') {
-                        className = ' hide';
-                      }
+                        if (firstChar === '+') {
+                          className = ' add';
+                        } else if (firstChar === '-') {
+                          className = ' remove';
+                        } else if (!stringsToRemove.includes(line)) {
+                          className = ' hide';
+                        }
 
-                      return (
-                        <span key={index} className={`line${className}`}>
-                          &nbsp;
-                        </span>
-                      );
-                    })}
+                        return (
+                          <span key={index} className={`line${className}`}>
+                            &nbsp;
+                          </span>
+                        );
+                      })}
                   </div>
                 </pre>
               );
             })}
 
-          {/* {count !== 0 && diffTest?.hunks[count - 1] && (
+          {count !== 0 && fileDiff?.hunks[count - 1] && (
             <pre>
-              <code className={fileExtension}>
-                {diffTest?.hunks[count - 1].lines.join('\n')}
+              <code key={count} ref={hunkRef} className={fileExtension}>
+                {fileDiff?.hunks[count - 1].lines
+                  .filter(
+                    (htmlString) =>
+                      !stringsToRemove.includes(htmlString.trim()),
+                  )
+                  .map((htmlString) => htmlString.slice(1))
+                  .join('\n')}
               </code>
-            </pre>
-          )} */}
 
-          {/* {count === 0 &&
-            diffTest?.hunks.map((hunk, index) => (
-              <div key={index} className='hunk'>
-                <ul className='lines'>
-                  {hunk.lines.map((line, lineIndex) => {
+              <div className='background-lines'>
+                {fileDiff?.hunks[count - 1].lines
+                  .filter(
+                    (htmlString) =>
+                      !stringsToRemove.includes(htmlString.trim()),
+                  )
+                  .map((line, index) => {
                     let className = '';
+                    const firstChar = line.charAt(0);
 
-                    if (line.charAt(0) === '+') {
+                    if (firstChar === '+') {
                       className = ' add';
-                    } else if (line.charAt(0) === '-') {
+                    } else if (firstChar === '-') {
                       className = ' remove';
-                    } else if (line === '\\ No newline at end of file') {
+                    } else if (!stringsToRemove.includes(line)) {
                       className = ' hide';
                     }
 
                     return (
-                      <li key={lineIndex} className={`line${className}`}>
-                        <span>{line.substring(1)}</span>
-                      </li>
+                      <span key={index} className={`line${className}`}>
+                        &nbsp;
+                      </span>
                     );
                   })}
-                </ul>
               </div>
-            ))} */}
-
-          {count !== 0 && diffTest?.hunks[count - 1] && (
-            <div key={count} className='hunk'>
-              <ul className='lines'>
-                {diffTest?.hunks[count - 1].lines.map((line, lineIndex) => {
-                  let className = '';
-
-                  if (line.charAt(0) === '+') {
-                    className = ' add';
-                  } else if (line.charAt(0) === '-') {
-                    className = ' remove';
-                  } else if (line === '\\ No newline at end of file') {
-                    className = ' hide';
-                  }
-
-                  return (
-                    <li key={lineIndex} className={`line${className}`}>
-                      <span>{line.substring(1)}</span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+            </pre>
           )}
         </fieldset>
       </nav>
