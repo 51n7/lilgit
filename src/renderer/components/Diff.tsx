@@ -99,8 +99,13 @@ function Diff({ diff, file, isOpen, setIsOpen }: DiffProps) {
       <nav className='view-diff'>
         <fieldset className='menu'>
           <legend>
-            {file?.path}
-            {count !== 0 ? ` - ${count}/${fileDiff?.hunks.length}` : ''}
+            <span>{file?.path}</span>
+            <span className='sep'></span>
+            {count !== 0 && (
+              <span>
+                Hunk {count}/{fileDiff?.hunks.length}
+              </span>
+            )}
           </legend>
 
           {count === 0 &&
