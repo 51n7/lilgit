@@ -66,6 +66,19 @@ button {
   color: $grey;
 }
 
+.text-center {
+  text-align: center;
+}
+
+.add-repo {
+  width: 100%;
+  background: none;
+  border: 2px solid $white;
+  color: $white;
+  max-width: 50%;
+  border-radius: 4px;
+}
+
 .repo-container {
   display: flex;
   align-items: center;

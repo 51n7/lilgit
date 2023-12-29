@@ -100,10 +100,10 @@ function RepoList({ onRepoSave, onRepoDelete, addRepo, list }: RepoListProps) {
 
   return (
     <div className='repo-container'>
-      <div className='repo-list'>
-        <ul>
-          {list &&
-            list.map((item, index) => (
+      {!!list.length && (
+        <div className='repo-list'>
+          <ul>
+            {list.map((item, index) => (
               <li key={item.short} id={`item-${index}`}>
                 <span
                   onClick={() => handleItemClick(index)}
@@ -117,8 +117,20 @@ function RepoList({ onRepoSave, onRepoDelete, addRepo, list }: RepoListProps) {
                 </span>
               </li>
             ))}
-        </ul>
-      </div>
+          </ul>
+        </div>
+      )}
+
+      {!list.length && (
+        <button
+          className='add-repo'
+          onClick={() => {
+            addRepo();
+          }}
+        >
+          Add Repo
+        </button>
+      )}
       <Menu options={keyMap} isOpen={showMenu} setIsOpen={setShowMenu} />
     </div>
   );
