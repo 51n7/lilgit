@@ -12,6 +12,7 @@ import Diff from './Diff';
 
 export type StatusProps = {
   status: ExtendedStatusResult | undefined;
+  onOpenFile: (name: string) => void;
   onFileStage: (name: string) => void;
   onFileUnstage: (name: string) => void;
   onFileDiscard: (name: string) => void;
@@ -27,6 +28,7 @@ export type StatusProps = {
 
 function Status({
   status,
+  onOpenFile,
   onFileStage,
   onFileUnstage,
   onFileDiscard,
@@ -60,7 +62,11 @@ function Status({
         key: 'o',
         description: 'open file',
         function: () => {
-          console.log('open');
+          if (selectedIndex !== null) {
+            onOpenFile(
+              findFileById(transformStatus, selectedIndex)?.path ?? '',
+            );
+          }
         },
       },
       {
@@ -164,8 +170,9 @@ function Status({
       stageAllUntracked,
       unstageAll,
       selectedIndex,
-      onFileStage,
+      onOpenFile,
       transformStatus,
+      onFileStage,
       onFileUnstage,
       showMenu,
       outputOpen,

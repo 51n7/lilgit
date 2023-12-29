@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron';
 import path from 'path';
 import os from 'os';
 import { simpleGit } from 'simple-git';
@@ -412,6 +412,10 @@ app.whenReady().then(() => {
     } catch (err) {
       event.sender.send('delete-branch-error', (err as Error).message);
     }
+  });
+
+  ipcMain.on('open-file', async (_event, path) => {
+    shell.openPath(path);
   });
 
   ipcMain.on('stage-file', async (event, path, name) => {

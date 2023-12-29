@@ -29,6 +29,7 @@ const App = () => {
   const views = [
     <Status
       status={status}
+      onOpenFile={onOpenFile}
       onFileStage={onFileStage}
       onFileUnstage={onFileUnstage}
       onFileDiscard={onFileDiscard}
@@ -76,6 +77,14 @@ const App = () => {
   function removeCurrentRepo() {
     setCurrentRepo(undefined);
     window.api.removeCurrent();
+  }
+
+  async function onOpenFile(name: string) {
+    try {
+      await window.api.openFile(`${currentRepo?.absolute}/${name}`);
+    } catch (error) {
+      setError((error as Error).message);
+    }
   }
 
   async function onFileStage(name: string) {

@@ -40,6 +40,7 @@ export type ContextBridgeApi = {
     path: string | undefined,
     name: string,
   ) => Promise<BranchSummary>;
+  openFile: (path: string) => void;
   stageFile: (
     path: string | undefined,
     name: string,
@@ -225,6 +226,10 @@ const exposedApi: ContextBridgeApi = {
         reject(new Error(error)),
       );
     });
+  },
+
+  openFile: (path) => {
+    ipcRenderer.send('open-file', path);
   },
 
   stageFile: (path, name) => {
