@@ -76,6 +76,7 @@ const App = () => {
 
   function removeCurrentRepo() {
     setCurrentRepo(undefined);
+    setStatus(undefined);
     window.api.removeCurrent();
   }
 

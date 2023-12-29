@@ -239,17 +239,20 @@ function Status({
   return (
     <div className='view-status'>
       {transformStatus &&
-        Object.keys(transformStatus).map((section) => (
-          <div key={section}>
-            <p className='text-red'>{section.toUpperCase()}:</p>
-            <StatusList
-              items={transformStatus[section]}
-              selectedIndex={selectedIndex}
-              onItemClick={handleItemClick}
-            />
-            <br />
-          </div>
-        ))}
+        Object.keys(transformStatus).map(
+          (section) =>
+            (transformStatus[section]?.length || 0) > 0 && (
+              <div key={section}>
+                <p className='text-red'>{section.toUpperCase()}:</p>
+                <StatusList
+                  items={transformStatus[section]}
+                  selectedIndex={selectedIndex}
+                  onItemClick={handleItemClick}
+                />
+                <br />
+              </div>
+            ),
+        )}
 
       {Object.keys(transformStatus).length === 0 && (
         <div>Your working directory is clean.</div>
